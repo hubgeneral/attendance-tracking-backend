@@ -25,7 +25,11 @@ namespace attendance_tracking_backend.ClientHttp
                     // Check if StaffId already exists to avoid duplicates
                     var existingUser = await _userManager.FindByNameAsync(dto.StaffId!);
 
+                    var existingEmail = await _userManager.FindByEmailAsync(dto.Email!);
+
                     if (existingUser != null) continue;
+
+                    if (existingEmail != null) continue;
                     
                     var user = new AppUser
                     {

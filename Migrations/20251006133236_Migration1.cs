@@ -60,39 +60,6 @@ namespace attendance_tracking_backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EmployeeDatas",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Email = table.Column<string>(type: "text", nullable: true),
-                    EmployeeName = table.Column<string>(type: "text", nullable: true),
-                    StaffId = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EmployeeDatas", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "LeaveDatas",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    EmployeeName = table.Column<string>(type: "text", nullable: true),
-                    Email = table.Column<string>(type: "text", nullable: true),
-                    DaysRequested = table.Column<int>(type: "integer", nullable: true),
-                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ApprovalStatus = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LeaveDatas", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -220,21 +187,23 @@ namespace attendance_tracking_backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Attendance",
+                name: "Attendances",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ClockIn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ClockOut = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TotalHoursWorked = table.Column<decimal>(type: "numeric", nullable: true),
                     Status = table.Column<string>(type: "text", nullable: true),
+                    CurrentDate = table.Column<DateOnly>(type: "date", nullable: false),
                     AppUserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Attendance", x => x.Id);
+                    table.PrimaryKey("PK_Attendances", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Attendance_AspNetUsers_AppUserId",
+                        name: "FK_Attendances_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -335,8 +304,8 @@ namespace attendance_tracking_backend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Attendance_AppUserId",
-                table: "Attendance",
+                name: "IX_Attendances_AppUserId",
+                table: "Attendances",
                 column: "AppUserId");
 
             migrationBuilder.CreateIndex(
@@ -372,13 +341,7 @@ namespace attendance_tracking_backend.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Attendance");
-
-            migrationBuilder.DropTable(
-                name: "EmployeeDatas");
-
-            migrationBuilder.DropTable(
-                name: "LeaveDatas");
+                name: "Attendances");
 
             migrationBuilder.DropTable(
                 name: "Leaves");

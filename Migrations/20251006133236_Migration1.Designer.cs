@@ -12,7 +12,7 @@ using attendance_tracking_backend.Data;
 namespace attendance_tracking_backend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250930171331_Migration1")]
+    [Migration("20251006133236_Migration1")]
     partial class Migration1
     {
         /// <inheritdoc />
@@ -286,36 +286,20 @@ namespace attendance_tracking_backend.Migrations
                     b.Property<DateTime>("ClockOut")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateOnly>("CurrentDate")
+                        .HasColumnType("date");
+
                     b.Property<string>("Status")
                         .HasColumnType("text");
+
+                    b.Property<decimal?>("TotalHoursWorked")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AppUserId");
 
-                    b.ToTable("Attendance");
-                });
-
-            modelBuilder.Entity("attendance_tracking_backend.Data.EmployeeData", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .HasColumnType("text");
-
-                    b.Property<string>("EmployeeName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("StaffId")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EmployeeDatas");
+                    b.ToTable("Attendances");
                 });
 
             modelBuilder.Entity("attendance_tracking_backend.Data.Leave", b =>
@@ -352,37 +336,6 @@ namespace attendance_tracking_backend.Migrations
                     b.HasIndex("AppUserId");
 
                     b.ToTable("Leaves");
-                });
-
-            modelBuilder.Entity("attendance_tracking_backend.Data.LeaveData", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ApprovalStatus")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("DaysRequested")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("text");
-
-                    b.Property<string>("EmployeeName")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LeaveDatas");
                 });
 
             modelBuilder.Entity("attendance_tracking_backend.Data.Request", b =>

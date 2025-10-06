@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace attendance_tracking_backend.Data
 {
-    public class DatabaseContext : IdentityDbContext<AppUser,IdentityRole<int>, int>                                           //DbContext
+    public class DatabaseContext : IdentityDbContext<AppUser,IdentityRole<int>, int> //DbContext
     {
          public DatabaseContext(DbContextOptions<DatabaseContext> options)
             : base(options) { }
@@ -17,7 +17,6 @@ namespace attendance_tracking_backend.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
 
 
             //Entity Relationships
@@ -38,7 +37,6 @@ namespace attendance_tracking_backend.Data
             modelBuilder.Entity<AppUser>()
                 .HasIndex(u => u.Email)
                 .IsUnique(); 
-
 
         }
     }
