@@ -48,24 +48,28 @@ namespace attendance_tracking_backend
             builder.Services.AddHttpClient<UserApiService>();
             builder.Services.AddHttpClient<FetchSaveLeaveService>();
             builder.Services.AddScoped<UserApiService>();
-            builder.Services.AddScoped<UserDataService>();
+           builder.Services.AddScoped<UserDataService>();
 
             // GraphQL
             builder.Services.AddGraphQLServer()
                 .AddQueryType<Query>()
+                .AddType<AttendanceQuery>() //extended querytype
                 .AddMutationType<Mutation>()
-                //.AddType<UserType>() // optional
+                .AddType<AttendanceMutation>()    //extended mutationtype
                 .AddProjections()
                 .AddFiltering()
                 .AddSorting();
+               //.AddType<UserType>() // optional
 
             // CORS
             builder.Services.AddCors();
 
             var app = builder.Build();
 
+           
             using (var scope = app.Services.CreateScope())
             {
+ 
                 // fetch and store employee data
                 var apiService = scope.ServiceProvider.GetRequiredService<UserApiService>();
                 var dataService = scope.ServiceProvider.GetRequiredService<UserDataService>();
@@ -88,12 +92,10 @@ namespace attendance_tracking_backend
                     .AllowAnyHeader()
                     .AllowAnyMethod());
             }
-
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapGraphQL();
-
             app.Run();
         }
     }

@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace attendance_tracking_backend.Data
 {
+
     public class AppUser :  IdentityUser<int>
     {
         override
@@ -18,7 +19,6 @@ namespace attendance_tracking_backend.Data
         override
         public string? NormalizedUserName { set; get; }
         public string? Password { set; get; }
-        public string? Role { set; get; }
         public string? Status { set; get; }
         public string? EmployeeType { set; get; }
         public ICollection<Leave>? Leaves { set; get; }
@@ -83,6 +83,5 @@ namespace attendance_tracking_backend.Data
         public DateTime ExitTime { get; set; }
         public int TotalExitTime { get; set; }
     }
-
 
 }

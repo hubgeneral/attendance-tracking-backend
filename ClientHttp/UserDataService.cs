@@ -8,15 +8,26 @@ namespace attendance_tracking_backend.ClientHttp
     public class UserDataService
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<IdentityRole<int>> _roleManager;
 
-        public UserDataService(UserManager<AppUser> userManager) 
+        public UserDataService(UserManager<AppUser> userManager, RoleManager<IdentityRole<int>> roleManager) 
         {
             this._userManager = userManager;
+            this._roleManager = roleManager;
         }
 
         public async Task StoreDataAsync(List<EmployeeData> data)
         {
             var users = data;
+
+
+            // Ensure roles exist
+            if (!await _roleManager.RoleExistsAsync("Admin"))
+                await _roleManager.CreateAsync(new IdentityRole<int>("Admin"));
+
+            if (!await _roleManager.RoleExistsAsync("User"))
+                await _roleManager.CreateAsync(new IdentityRole<int>("User"));
+                
 
             if (users != null)
             {
@@ -38,14 +49,16 @@ namespace attendance_tracking_backend.ClientHttp
                         StaffId = dto.StaffId,
                         UserName = dto.StaffId,
                        // NormalizedUserName = _userManager.NormalizeName(dto.StaffId),
-                        Role = "Employee"
+                       // Role = "Employee"
                     };
 
                   var result =   await _userManager.CreateAsync(user, "password@123");
+
+                    if(result.Succeeded)
+                    { await _userManager.AddToRoleAsync(user, "User"); }
+                    
                     if (!result.Succeeded)
-                    {
-                        Console.WriteLine($"Failed to create user {dto.StaffId}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-                    }
+                    {  Console.WriteLine($"Failed to create user {dto.StaffId}: {string.Join(", ", result.Errors.Select(e => e.Description))}"); }
                 }
 
             }

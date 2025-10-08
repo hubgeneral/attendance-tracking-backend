@@ -12,7 +12,7 @@ using attendance_tracking_backend.Data;
 namespace attendance_tracking_backend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251006133236_Migration1")]
+    [Migration("20251007191101_Migration1")]
     partial class Migration1
     {
         /// <inheritdoc />
@@ -52,6 +52,20 @@ namespace attendance_tracking_backend.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -234,9 +248,6 @@ namespace attendance_tracking_backend.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("Role")
-                        .HasColumnType("text");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");

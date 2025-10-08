@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace attendance_tracking_backend.DTO
 {
+    //Employee Data
     public class EmployeeData
     {
         [Key]
@@ -12,8 +13,7 @@ namespace attendance_tracking_backend.DTO
         public string? StaffId { set; get; }  //Username
     }
 
-
-
+    //Leave Data
     public class LeaveData
     {
         public int Id { set; get; }
@@ -26,6 +26,40 @@ namespace attendance_tracking_backend.DTO
         public DateTime? StartDate { set; get; }
         public DateTime? EndDate { set; get; }
         public string? ApprovalStatus { set; get; }
+    }
 
+
+    public class UserLoginResponse
+    {
+        public string? Token { get; set; }   // add token here
+        public string? Id { get; set; }
+        public string? UserName { get; set; }
+
+        public string? Role {  get; set; }
+    }
+
+
+ 
+
+    public class UserForgotPasswordResponse
+    {
+        public string? Token { get; set; }   // add token here
+        public string? Id { get; set; }
+        public string? Username { get; set; }
+    }
+
+    public class UserResetPasswordResponse
+    {
+        public string? Token { get; set; }   // add token here
+        public string? Id { get; set; }
+        public string? Username { get; set; }
+
+    }
+
+    public class UserChangePassword
+    {
+        public string? Token { get; set; }   // add token here
+        public string? Id { get; set; }
+        public string? Username { get; set; }
     }
 }
