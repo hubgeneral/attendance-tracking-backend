@@ -5,7 +5,6 @@ using System.Text.Json.Serialization;
 
 namespace attendance_tracking_backend.Data
 {
-
     public class AppUser :  IdentityUser<int>
     {
         override
@@ -25,6 +24,22 @@ namespace attendance_tracking_backend.Data
         public ICollection<Attendance>? Attendances { set; get; }
         public ICollection<Request>? Requests { set; get; }
         public ICollection<ActivityLogger>? ActivityLogger { set; get; }
+        public  ICollection<AppUserRole> UserRoles { set; get; }  = new List<AppUserRole>();
+    }
+
+    public class AppRole : IdentityRole<int>
+    {
+        public AppRole() { }
+        public AppRole(string roleName) : base(roleName){ }
+
+        public  ICollection<AppUserRole> UserRoles { set; get; } = new List<AppUserRole>();
+    }
+
+
+   public class AppUserRole : IdentityUserRole<int> 
+    {      
+        public required AppUser User { get; set; }
+        public required AppRole Role { get; set; }
     }
 
     public class Attendance
