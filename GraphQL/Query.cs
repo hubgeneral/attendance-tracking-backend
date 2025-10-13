@@ -2,12 +2,11 @@
 using HotChocolate.Data;
 using attendance_tracking_backend.Data;
 using Microsoft.EntityFrameworkCore;
-using attendance_tracking_backend.DTO;
 
 
 namespace attendance_tracking_backend.GraphQL
 {
-    public class UserQuery
+    public class Query
     {
         //User Queries ******************************
 
@@ -21,32 +20,11 @@ namespace attendance_tracking_backend.GraphQL
         {
             return dbcontext.AppUsers.Find(id);
         }
-
-        [UseProjection, UseFiltering, UseSorting]
-
-        public async Task<IEnumerable<UserWithRoleResponse>> GetUsersWithRoles([Service] DatabaseContext dbcontext)
-        {
-
-            var query =  from user in dbcontext.AppUsers
-                         join userRole in dbcontext.UserRoles on user.Id equals userRole.UserId
-                         join role in dbcontext.Roles on userRole.RoleId equals role.Id
-                         select new UserWithRoleResponse
-                         {
-                             UserId = user.Id,
-                             UserName = user.UserName,
-                             StaffId = user.StaffId,
-                             EmployeeName = user.EmployeeName,
-                             EmployeeType = user.EmployeeType,
-                             Email = user.Email,
-                             RoleId = role.Id,
-                             RoleName = role.Name
-                         };
-
-            return await query.ToListAsync();
-        }
+  
     }
 
 }
+
 
 /*  [UseProjection, UseFiltering, UseSorting]
         public AppUser? GetUserLeaveById(int Id,[Service] DatabaseContext dbcontext)

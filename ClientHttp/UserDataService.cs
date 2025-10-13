@@ -8,9 +8,9 @@ namespace attendance_tracking_backend.ClientHttp
     public class UserDataService
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly RoleManager<AppRole> _roleManager;
+        private readonly RoleManager<IdentityRole<int>> _roleManager;
 
-        public UserDataService(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager) 
+        public UserDataService(UserManager<AppUser> userManager, RoleManager<IdentityRole<int>> roleManager) 
         {
             this._userManager = userManager;
             this._roleManager = roleManager;
@@ -23,10 +23,10 @@ namespace attendance_tracking_backend.ClientHttp
 
             // Ensure roles exist
             if (!await _roleManager.RoleExistsAsync("Admin"))
-                await _roleManager.CreateAsync(new AppRole("Admin"));
+                await _roleManager.CreateAsync(new IdentityRole<int>("Admin"));
 
             if (!await _roleManager.RoleExistsAsync("User"))
-                await _roleManager.CreateAsync(new AppRole("User"));
+                await _roleManager.CreateAsync(new IdentityRole<int>("User"));
                 
 
             if (users != null)

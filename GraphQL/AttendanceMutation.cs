@@ -3,6 +3,5 @@
     [ExtendObjectType("Mutation")]
     public class AttendanceMutation
     {
-
     }
 }

@@ -10,8 +10,7 @@ using System.Text;
 
 namespace attendance_tracking_backend.GraphQL
 {
-
-    public class UserMutation   //resolvers
+    public class Mutation   //resolvers
     {
         //User Mutations ******************************
 

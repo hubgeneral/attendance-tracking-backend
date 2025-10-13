@@ -15,11 +15,13 @@ namespace attendance_tracking_backend.GraphQL
             return dbcontext.Attendances;
         }
 
-        public IQueryable<Attendance> GetAttendanceByUserId(int id, [Service] DatabaseContext dbcontext)
+        public IQueryable<Attendance> GetAttendanceByUserId(string username, [Service] DatabaseContext dbcontext)
         {
-           // var user = dbcontext.Users.Where(u=> u.UserName == username).FirstOrDefault();    
-            return dbcontext.Attendances.Where(a => a.AppUserId == id );
+            var user = dbcontext.Users.Where(u=> u.UserName == username).FirstOrDefault();
+      
+            return dbcontext.Attendances.Where(a => a.AppUserId == user!.Id);
         }
-       
+
+        
     }
 }

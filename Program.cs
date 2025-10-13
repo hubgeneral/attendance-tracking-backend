@@ -19,7 +19,7 @@ namespace attendance_tracking_backend
             // Database
             builder.Services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("PgsqlConnection")));
             // Identity
-            builder.Services.AddIdentity<AppUser, AppRole>(options =>
+            builder.Services.AddIdentity<AppUser, IdentityRole<int>>(options =>
             {
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
@@ -44,23 +44,23 @@ namespace attendance_tracking_backend
                 });
 
             builder.Services.AddAuthorization();
-
             // Http Clients and Services
             builder.Services.AddHttpClient<UserApiService>();
             builder.Services.AddHttpClient<FetchSaveLeaveService>();
             builder.Services.AddScoped<UserApiService>();
-            builder.Services.AddScoped<UserDataService>();
+           builder.Services.AddScoped<UserDataService>();
 
             // GraphQL
             builder.Services.AddGraphQLServer()
-                .AddQueryType<UserQuery>()        //main query object
-                .AddType<AttendanceQuery>()       //extended querytype
-                .AddMutationType<UserMutation>()  //main mutation object
+                .AddQueryType<Query>()
+                .AddType<AttendanceQuery>() //extended querytype
+                .AddMutationType<Mutation>()
                 .AddType<AttendanceMutation>()    //extended mutationtype
                 .AddProjections()
                 .AddFiltering()
                 .AddSorting();
-              
+               //.AddType<UserType>() // optional
+
             // CORS
             builder.Services.AddCors();
 

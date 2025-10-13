@@ -21,7 +21,7 @@ namespace attendance_tracking_backend.DTO
 
         public string? Email { set; get; }
 
-        [JsonConverter(typeof(NullableIntConverter))]
+       [JsonConverter(typeof(NullableIntConverter))]
         public int? DaysRequested { set; get; }
         public DateTime? StartDate { set; get; }
         public DateTime? EndDate { set; get; }
@@ -35,11 +35,11 @@ namespace attendance_tracking_backend.DTO
         public string? Id { get; set; }
         public string? UserName { get; set; }
 
-        public string? Role { get; set; }
+        public string? Role {  get; set; }
     }
 
 
-
+ 
 
     public class UserForgotPasswordResponse
     {
@@ -62,19 +62,4 @@ namespace attendance_tracking_backend.DTO
         public string? Id { get; set; }
         public string? Username { get; set; }
     }
-
-
-    public class UserWithRoleResponse
-    {
-        public int UserId { set; get; }
-        public string? EmployeeName { set; get; }
-        public string? Email { set; get; }
-        public string? StaffId { set; get; }
-        public string? UserName { set; get; }
-        public string? Status { set; get; }
-        public string? EmployeeType { set; get; }
-        public int RoleId { set; get; }
-        public string? RoleName { set; get; }
-    }
-
 }
