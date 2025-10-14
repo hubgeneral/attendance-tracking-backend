@@ -8,9 +8,9 @@ namespace attendance_tracking_backend.ClientHttp
     public class UserDataService
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly RoleManager<IdentityRole<int>> _roleManager;
+        private readonly RoleManager<AppRole> _roleManager;
 
-        public UserDataService(UserManager<AppUser> userManager, RoleManager<IdentityRole<int>> roleManager) 
+        public UserDataService(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager) 
         {
             this._userManager = userManager;
             this._roleManager = roleManager;
@@ -23,10 +23,10 @@ namespace attendance_tracking_backend.ClientHttp
 
             // Ensure roles exist
             if (!await _roleManager.RoleExistsAsync("Admin"))
-                await _roleManager.CreateAsync(new IdentityRole<int>("Admin"));
+                await _roleManager.CreateAsync(new AppRole("Admin"));
 
             if (!await _roleManager.RoleExistsAsync("User"))
-                await _roleManager.CreateAsync(new IdentityRole<int>("User"));
+                await _roleManager.CreateAsync(new AppRole("User"));
                 
 
             if (users != null)
@@ -48,8 +48,7 @@ namespace attendance_tracking_backend.ClientHttp
                         Email = dto.Email,
                         StaffId = dto.StaffId,
                         UserName = dto.StaffId,
-                       // NormalizedUserName = _userManager.NormalizeName(dto.StaffId),
-                       // Role = "Employee"
+                      
                     };
 
                   var result =   await _userManager.CreateAsync(user, "password@123");
@@ -67,29 +66,3 @@ namespace attendance_tracking_backend.ClientHttp
     }
 }
 
-
-/*if (users != null)
-          {
-              foreach (var dto in users)
-              {
-                  // Check if StaffId already exists to avoid duplicates
-                  var existingUser = await _dbcontext.AppUsers.FirstOrDefaultAsync(u => u.StaffId == dto.StaffId);
-                  var exisingUser = await _userManager.FindByNameAsync(dto.StaffId!);
-
-                  if (existingUser == null)
-                  {
-                      var user = new AppUser
-                      {
-                          EmployeeName = dto.EmployeeName,
-                          Email = dto.Email,
-                          StaffId = dto.StaffId, 
-                          UserName = dto.StaffId,
-                      };
-
-                     _dbcontext.AppUsers.Add(user);
-                  }
-              }
-              await _dbcontext.SaveChangesAsync();
-
-
-          }*/

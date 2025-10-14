@@ -62,4 +62,17 @@ namespace attendance_tracking_backend.DTO
         public string? Id { get; set; }
         public string? Username { get; set; }
     }
+
+    public class UserWithRoleResponse
+    {
+        public int UserId { get; set; }
+        public string? StaffId { get; set; } 
+        public string? UserName { get; set; } 
+        public string? EmployeeName { get; set; } 
+        public string? EmployeeType { get; set; } 
+        public string? Email { get; set; } 
+        public int RoleId { get; set; } 
+        public string? RoleName { get; set; } 
+        public string? Status { get; set; } 
+    }
 }

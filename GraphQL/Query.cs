@@ -1,7 +1,8 @@
-﻿using System;
+﻿using attendance_tracking_backend.Data;
+using attendance_tracking_backend.DTO;
 using HotChocolate.Data;
-using attendance_tracking_backend.Data;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 
 namespace attendance_tracking_backend.GraphQL
@@ -20,33 +21,54 @@ namespace attendance_tracking_backend.GraphQL
         {
             return dbcontext.AppUsers.Find(id);
         }
-  
+
+        [UseProjection, UseFiltering, UseSorting]
+        public  IEnumerable<UserWithRoleResponse> GetUsersWithRoles([Service] DatabaseContext context)
+        {
+            var query = from user in context.Users
+                        join userRole in context.UserRoles on user.Id equals userRole.UserId
+                        join role in context.Roles on userRole.RoleId equals role.Id
+
+                        select new UserWithRoleResponse
+                        {
+                            UserId = user.Id,
+                            StaffId = user.StaffId!,
+                            UserName = user.UserName!,
+                            EmployeeName = user.EmployeeName!,
+                            EmployeeType = user.EmployeeType!,
+                            Email = user.Email!,
+                            RoleId = role.Id,
+                            RoleName = role.Name!,
+                            Status = user.Status!
+                        };
+
+            return query.ToList();
+        }
+
+     /*   [UseProjection, UseFiltering, UseSorting]
+        public async Task<IEnumerable<UserWithRoleResponse>> GetUsersWithRoles([Service] DatabaseContext context)
+        {
+            var query = from user in context.Users
+                        join userRole in context.UserRoles on user.Id equals userRole.UserId
+                        join role in context.Roles on userRole.RoleId equals role.Id
+
+                        select new UserWithRoleResponse
+                        {
+                            UserId = user.Id,
+                            StaffId = user.StaffId!,
+                            UserName = user.UserName!,
+                            EmployeeName = user.EmployeeName!,
+                            EmployeeType = user.EmployeeType!,
+                            Email = user.Email!,
+                            RoleId = role.Id,
+                            RoleName = role.Name!,
+                            Status = user.Status!
+                        };
+
+            return await query.ToListAsync();
+        }*/
+
     }
 
 }
 
-
-/*  [UseProjection, UseFiltering, UseSorting]
-        public AppUser? GetUserLeaveById(int Id,[Service] DatabaseContext dbcontext)
-        {                           // join User with Leaves
-            return  dbcontext.AppUsers.Include(u => u.Leaves).FirstOrDefault(u => u.Id == Id);
-        }
-
-
-        //Leave Queries ********************************
-
-
-        [UseProjection, UseFiltering, UseSorting]
-        public IQueryable<Leave> GetLeaves([Service] DatabaseContext dbcontext)
-            {
-              return dbcontext.Leaves;
-            }
-
-        public Leave? GetLeaveById(int Id, [Service] DatabaseContext dbcontext)
-        {
-            return dbcontext.Leaves.Find(Id);
-        }
-
-
-        //Attendance Inputs ***************************************
-*/

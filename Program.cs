@@ -19,7 +19,7 @@ namespace attendance_tracking_backend
             // Database
             builder.Services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("PgsqlConnection")));
             // Identity
-            builder.Services.AddIdentity<AppUser, IdentityRole<int>>(options =>
+            builder.Services.AddIdentity<AppUser,AppRole>(options =>
             {
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
