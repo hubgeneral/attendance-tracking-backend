@@ -35,7 +35,8 @@ namespace attendance_tracking_backend.GraphQL
                     
                     new Claim("Id", user.Id.ToString() ?? ""),
                     new Claim("userName", user.UserName ?? ""),
-                    new Claim("userRole", userRole!.Name!)
+                    new Claim("userRole", userRole!.Name!),
+                    new Claim("IsPasswordReset",user.IsPasswordReset.ToString() )
                    /*new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                     * new Claim(ClaimTypes.Name, user.UserName ?? ""),
                     new Claim(ClaimTypes.Role, user.Role ?? "User"),
