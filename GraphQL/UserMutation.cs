@@ -10,7 +10,7 @@ using System.Text;
 
 namespace attendance_tracking_backend.GraphQL
 {
-    public class Mutation   //resolvers
+    public class UserMutation   //resolvers
     {
         //User Mutations ******************************
 
@@ -58,7 +58,8 @@ namespace attendance_tracking_backend.GraphQL
                 Token = tokenString,
                 Id = user.Id.ToString(),
                 UserName = user.UserName,
-                Role =  userRole.Name
+                Role =  userRole.Name,
+                IsPasswordReset = user.IsPasswordReset
             };
         }
         

@@ -7,7 +7,7 @@ using System;
 
 namespace attendance_tracking_backend.GraphQL
 {
-    public class Query
+    public class UserQuery
     {
         //User Queries ******************************
 

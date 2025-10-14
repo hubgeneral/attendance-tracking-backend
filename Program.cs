@@ -52,9 +52,9 @@ namespace attendance_tracking_backend
 
             // GraphQL
             builder.Services.AddGraphQLServer()
-                .AddQueryType<Query>()
+                .AddQueryType<UserQuery>()
                 .AddType<AttendanceQuery>() //extended querytype
-                .AddMutationType<Mutation>()
+                .AddMutationType<UserMutation>()
                 .AddType<AttendanceMutation>()    //extended mutationtype
                 .AddProjections()
                 .AddFiltering()

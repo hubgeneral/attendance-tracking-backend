@@ -41,6 +41,7 @@ namespace attendance_tracking_backend.Migrations
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Password = table.Column<string>(type: "text", nullable: true),
+                    IsPasswordReset = table.Column<bool>(type: "boolean", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: true),
                     EmployeeType = table.Column<string>(type: "text", nullable: true),
                     NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),

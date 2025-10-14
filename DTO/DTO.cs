@@ -34,12 +34,12 @@ namespace attendance_tracking_backend.DTO
         public string? Token { get; set; }   // add token here
         public string? Id { get; set; }
         public string? UserName { get; set; }
-
         public string? Role {  get; set; }
+        public bool IsPasswordReset { get; set; }
     }
 
 
- 
+
 
     public class UserForgotPasswordResponse
     {
@@ -74,5 +74,7 @@ namespace attendance_tracking_backend.DTO
         public int RoleId { get; set; } 
         public string? RoleName { get; set; } 
         public string? Status { get; set; } 
+
+
     }
 }

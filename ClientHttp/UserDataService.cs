@@ -41,14 +41,14 @@ namespace attendance_tracking_backend.ClientHttp
                     if (existingUser != null) continue;
 
                     if (existingEmail != null) continue;
-                    
+
                     var user = new AppUser
                     {
                         EmployeeName = dto.EmployeeName,
                         Email = dto.Email,
                         StaffId = dto.StaffId,
                         UserName = dto.StaffId,
-                      
+                        IsPasswordReset = false
                     };
 
                   var result =   await _userManager.CreateAsync(user, "password@123");

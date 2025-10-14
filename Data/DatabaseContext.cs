@@ -60,8 +60,8 @@ namespace attendance_tracking_backend.Data
             // Prevent duplicate emails
             modelBuilder.Entity<AppUser>()
                 .HasIndex(u => u.Email)
-                .IsUnique()
-                .HasFilter("[Email] IS NOT NULL");
+                .IsUnique();
+               // .HasFilter("[Email] IS NOT NULL");
 
         }
     }

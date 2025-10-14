@@ -19,6 +19,7 @@ namespace attendance_tracking_backend.Data
         override
         public string? NormalizedUserName { set; get; }
         public string? Password { set; get; }
+        public bool IsPasswordReset {  set; get; }
         public string? Status { set; get; }
         public string? EmployeeType { set; get; }
         public ICollection<Leave>? Leaves { set; get; }
