@@ -31,10 +31,12 @@ namespace attendance_tracking_backend.DTO
 
     public class UserLoginResponse
     {
-        public string? Token { get; set; }   // add token here
+       
         public string? Id { get; set; }
         public string? UserName { get; set; }
         public string? Role {  get; set; }
+        public string? AccessToken { get; set; }   // add token here
+        public string? RefreshToken { get; set; }   // add token here
         public bool IsPasswordReset { get; set; }
     }
 
@@ -50,10 +52,8 @@ namespace attendance_tracking_backend.DTO
 
     public class UserResetPasswordResponse
     {
-        public string? Token { get; set; }   // add token here
-        public string? Id { get; set; }
-        public string? Username { get; set; }
-
+        public string? message { get; set; }
+        public bool? IsPasswordReset { get; set; }
     }
 
     public class UserChangePassword

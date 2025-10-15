@@ -12,7 +12,7 @@ using attendance_tracking_backend.Data;
 namespace attendance_tracking_backend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251014115100_Migration1")]
+    [Migration("20251015114035_Migration1")]
     partial class Migration1
     {
         /// <inheritdoc />
@@ -130,11 +130,14 @@ namespace attendance_tracking_backend.Migrations
                     b.Property<int>("AppUserId")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("TimeOfDay")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AppUserId");
 
-                    b.ToTable("ActivityLogger");
+                    b.ToTable("ActivityLoggers");
                 });
 
             modelBuilder.Entity("attendance_tracking_backend.Data.AppRole", b =>
@@ -294,13 +297,16 @@ namespace attendance_tracking_backend.Migrations
                     b.Property<int>("AppUserId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("ClockIn")
+                    b.Property<DateTime?>("ClockIn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("ClockOut")
+                    b.Property<DateTime?>("ClockOut")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateOnly>("CurrentDate")
+                    b.Property<bool>("ClockingType")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateOnly?>("CurrentDate")
                         .HasColumnType("date");
 
                     b.Property<string>("Status")
@@ -314,6 +320,36 @@ namespace attendance_tracking_backend.Migrations
                     b.HasIndex("AppUserId");
 
                     b.ToTable("Attendances");
+                });
+
+            modelBuilder.Entity("attendance_tracking_backend.Data.ExitLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateOnly>("CurrentDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("EntryTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExitTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TotalExitTime")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.ToTable("ExitLogs");
                 });
 
             modelBuilder.Entity("attendance_tracking_backend.Data.Leave", b =>
@@ -352,6 +388,37 @@ namespace attendance_tracking_backend.Migrations
                     b.ToTable("Leaves");
                 });
 
+            modelBuilder.Entity("attendance_tracking_backend.Data.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("attendance_tracking_backend.Data.Request", b =>
                 {
                     b.Property<int>("Id")
@@ -363,14 +430,17 @@ namespace attendance_tracking_backend.Migrations
                     b.Property<int>("AppUserId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("RequestDescription")
+                    b.Property<string>("Description")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("TimeOfDay")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AppUserId");
 
-                    b.ToTable("Request");
+                    b.ToTable("Requests");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -412,7 +482,7 @@ namespace attendance_tracking_backend.Migrations
             modelBuilder.Entity("attendance_tracking_backend.Data.ActivityLogger", b =>
                 {
                     b.HasOne("attendance_tracking_backend.Data.AppUser", "User")
-                        .WithMany("ActivityLogger")
+                        .WithMany("ActivityLoggers")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -450,10 +520,32 @@ namespace attendance_tracking_backend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("attendance_tracking_backend.Data.ExitLog", b =>
+                {
+                    b.HasOne("attendance_tracking_backend.Data.AppUser", "User")
+                        .WithMany("ExitLogs")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("attendance_tracking_backend.Data.Leave", b =>
                 {
                     b.HasOne("attendance_tracking_backend.Data.AppUser", "User")
                         .WithMany("Leaves")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("attendance_tracking_backend.Data.RefreshToken", b =>
+                {
+                    b.HasOne("attendance_tracking_backend.Data.AppUser", "User")
+                        .WithMany("RefreshTokens")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -479,11 +571,15 @@ namespace attendance_tracking_backend.Migrations
 
             modelBuilder.Entity("attendance_tracking_backend.Data.AppUser", b =>
                 {
-                    b.Navigation("ActivityLogger");
+                    b.Navigation("ActivityLoggers");
 
                     b.Navigation("Attendances");
 
+                    b.Navigation("ExitLogs");
+
                     b.Navigation("Leaves");
+
+                    b.Navigation("RefreshTokens");
 
                     b.Navigation("Requests");
 

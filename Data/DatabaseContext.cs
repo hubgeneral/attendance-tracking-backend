@@ -4,20 +4,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace attendance_tracking_backend.Data
 {
-    public class DatabaseContext : IdentityDbContext<AppUser, AppRole, int,
-                     IdentityUserClaim<int>, AppUserRole,
-                     IdentityUserLogin<int>, IdentityRoleClaim<int>,
-                     IdentityUserToken<int>>   //IdentityDbContext<AppUser,IdentityRole<int>, int> //DbContext
+    public class DatabaseContext : IdentityDbContext<AppUser, AppRole, int,IdentityUserClaim<int>, AppUserRole, IdentityUserLogin<int>, IdentityRoleClaim<int>, IdentityUserToken<int>>   //IdentityDbContext<AppUser,IdentityRole<int>, int> //DbContext
     {
+        public DatabaseContext() { }
+
          public DatabaseContext(DbContextOptions<DatabaseContext> options)
             : base(options) { }
 
         public DbSet<AppUser> AppUsers { get; set; }
         public DbSet<AppRole> AppRoles { get; set; }
         public override DbSet<AppUserRole> UserRoles { get; set; }
-
         public DbSet<Leave> Leaves { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
+        public DbSet<Request> Requests { get; set; }
+        public DbSet<ExitLog> ExitLogs { get; set; }        
+        public DbSet<ActivityLogger> ActivityLoggers { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -56,6 +61,28 @@ namespace attendance_tracking_backend.Data
                 .HasOne(a => a.User)
                 .WithMany(u => u.Attendances)
                 .HasForeignKey(a => a.AppUserId);
+
+            modelBuilder.Entity<Request>()
+                .HasOne(r => r.User)
+                .WithMany(u => u.Requests)
+                .HasForeignKey(r => r.AppUserId);
+
+            modelBuilder.Entity<ExitLog>()
+                .HasOne(e => e.User)
+                .WithMany(u => u.ExitLogs)
+                .HasForeignKey(e => e.AppUserId);
+
+
+            modelBuilder.Entity<ActivityLogger>()
+                .HasOne(a => a.User)
+                .WithMany(u => u.ActivityLoggers)
+                .HasForeignKey(a => a.AppUserId);
+
+            modelBuilder.Entity<RefreshToken>()
+              .HasOne(r => r.User)
+              .WithMany(u => u.RefreshTokens)
+              .HasForeignKey(a => a.AppUserId);
+
 
             // Prevent duplicate emails
             modelBuilder.Entity<AppUser>()

@@ -83,20 +83,21 @@ namespace attendance_tracking_backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ActivityLogger",
+                name: "ActivityLoggers",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ActivityLog = table.Column<string>(type: "text", nullable: true),
                     ActivityDescription = table.Column<string>(type: "text", nullable: true),
+                    TimeOfDay = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     AppUserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ActivityLogger", x => x.Id);
+                    table.PrimaryKey("PK_ActivityLoggers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ActivityLogger_AspNetUsers_AppUserId",
+                        name: "FK_ActivityLoggers_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -194,11 +195,12 @@ namespace attendance_tracking_backend.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ClockIn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ClockOut = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ClockIn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ClockOut = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ClockingType = table.Column<bool>(type: "boolean", nullable: false),
                     TotalHoursWorked = table.Column<decimal>(type: "numeric", nullable: true),
                     Status = table.Column<string>(type: "text", nullable: true),
-                    CurrentDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    CurrentDate = table.Column<DateOnly>(type: "date", nullable: true),
                     AppUserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -206,6 +208,29 @@ namespace attendance_tracking_backend.Migrations
                     table.PrimaryKey("PK_Attendances", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Attendances_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExitLogs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ExitTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EntryTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TotalExitTime = table.Column<int>(type: "integer", nullable: false),
+                    CurrentDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    AppUserId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExitLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ExitLogs_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -238,19 +263,43 @@ namespace attendance_tracking_backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Request",
+                name: "RefreshTokens",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RequestDescription = table.Column<string>(type: "text", nullable: true),
+                    Token = table.Column<string>(type: "text", nullable: false),
+                    Expires = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "boolean", nullable: false),
+                    IsUsed = table.Column<bool>(type: "boolean", nullable: false),
                     AppUserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Request", x => x.Id);
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Request_AspNetUsers_AppUserId",
+                        name: "FK_RefreshTokens_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Requests",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    TimeOfDay = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AppUserId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Requests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Requests_AspNetUsers_AppUserId",
                         column: x => x.AppUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -267,8 +316,8 @@ namespace attendance_tracking_backend.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ActivityLogger_AppUserId",
-                table: "ActivityLogger",
+                name: "IX_ActivityLoggers_AppUserId",
+                table: "ActivityLoggers",
                 column: "AppUserId");
 
             migrationBuilder.CreateIndex(
@@ -320,13 +369,23 @@ namespace attendance_tracking_backend.Migrations
                 column: "AppUserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ExitLogs_AppUserId",
+                table: "ExitLogs",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Leaves_AppUserId",
                 table: "Leaves",
                 column: "AppUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Request_AppUserId",
-                table: "Request",
+                name: "IX_RefreshTokens_AppUserId",
+                table: "RefreshTokens",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Requests_AppUserId",
+                table: "Requests",
                 column: "AppUserId");
         }
 
@@ -334,7 +393,7 @@ namespace attendance_tracking_backend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ActivityLogger");
+                name: "ActivityLoggers");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
@@ -355,10 +414,16 @@ namespace attendance_tracking_backend.Migrations
                 name: "Attendances");
 
             migrationBuilder.DropTable(
+                name: "ExitLogs");
+
+            migrationBuilder.DropTable(
                 name: "Leaves");
 
             migrationBuilder.DropTable(
-                name: "Request");
+                name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
+                name: "Requests");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

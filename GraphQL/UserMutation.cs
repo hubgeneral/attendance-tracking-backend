@@ -6,16 +6,17 @@ using Microsoft.IdentityModel.Tokens;
 using Npgsql.PostgresTypes;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace attendance_tracking_backend.GraphQL
 {
+    [ExtendObjectType(OperationTypeNames.Mutation)]
     public class UserMutation   //resolvers
     {
         //User Mutations ******************************
 
         //Login with username and password
-        // public async Task<string> Login(string username, string password, [Service] SignInManager<AppUser> signInManager,[Service] UserManager<AppUser> userManager, [Service] IConfiguration config)
         public async Task<UserLoginResponse> Login(string username, string password, [Service] SignInManager<AppUser> signInManager, [Service] UserManager<AppUser> userManager, [Service] DatabaseContext dbcontext, [Service] IConfiguration config)
         {
             //Find
@@ -32,34 +33,42 @@ namespace attendance_tracking_backend.GraphQL
 
             var claims = new[]
                 {
-                    
                     new Claim("Id", user.Id.ToString() ?? ""),
                     new Claim("userName", user.UserName ?? ""),
                     new Claim("userRole", userRole!.Name!),
-                    new Claim("IsPasswordReset",user.IsPasswordReset.ToString() )
-                   /*new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                    * new Claim(ClaimTypes.Name, user.UserName ?? ""),
-                    new Claim(ClaimTypes.Role, user.Role ?? "User"),
-                    new Claim(ClaimTypes.Email, user.Email ?? "Email")*/
+                    new Claim("IsPasswordReset",user.IsPasswordReset.ToString() )          
                 };
 
             //Read key from config
             var secret = config["Jwt:Key"];
-            if (string.IsNullOrEmpty(secret)) throw new InvalidOperationException("JWT key is not configured in appsettings.json or environment variables.");
+            if (string.IsNullOrEmpty(secret)) throw new InvalidOperationException("JWT key missing.");
             //Create key and signing credentials
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             //  Create token
-            var token = new JwtSecurityToken(issuer: config["Jwt:Issuer"], audience: config["Jwt:Audience"], claims: claims,   expires: DateTime.UtcNow.AddHours(1),signingCredentials: creds);
+            var accessToken = new JwtSecurityToken(issuer: config["Jwt:Issuer"], audience: config["Jwt:Audience"], claims: claims,   expires: DateTime.UtcNow.AddHours(1),signingCredentials: creds);
             //return new JwtSecurityTokenHandler().WriteToken(token);
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+            var accessTokenString = new JwtSecurityTokenHandler().WriteToken(accessToken);
+
+            // --- Create Refresh Token ---
+            var refreshToken = new RefreshToken
+            {
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Expires = DateTime.UtcNow.AddDays(7),
+                AppUserId = user.Id
+            };
+
+            dbcontext.RefreshTokens.Add(refreshToken);
+            await dbcontext.SaveChangesAsync();
+
 
             return new UserLoginResponse
             {
-                Token = tokenString,
+                AccessToken = accessTokenString,
+                RefreshToken = refreshToken.Token,
                 Id = user.Id.ToString(),
                 UserName = user.UserName,
-                Role =  userRole.Name,
+                Role = userRole.Name,
                 IsPasswordReset = user.IsPasswordReset
             };
         }
@@ -86,31 +95,45 @@ namespace attendance_tracking_backend.GraphQL
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             //Create token
-            var token = new JwtSecurityToken(issuer: config["Jwt:Issuer"], audience: config["Jwt:Audience"], claims: claims, expires: DateTime.UtcNow.AddHours(1), signingCredentials: creds);
+            var accessToken = new JwtSecurityToken(issuer: config["Jwt:Issuer"], audience: config["Jwt:Audience"], claims: claims, expires: DateTime.UtcNow.AddHours(1), signingCredentials: creds);
             //return new JwtSecurityTokenHandler().WriteToken(token);
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+            var accessTokenString = new JwtSecurityTokenHandler().WriteToken(accessToken);
+
+            // --- Create Refresh Token ---
+            var refreshToken = new RefreshToken
+            {
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Expires = DateTime.UtcNow.AddDays(7),
+                AppUserId = user.Id
+            };
 
             return new UserLoginResponse
             {
-                Token = tokenString,
+                AccessToken = accessTokenString,
+                RefreshToken = refreshToken.Token,
                 Id = user.Id.ToString(),
                 UserName = user.UserName,
-                Role =  userRole.Name
+                Role = userRole.Name,
+                IsPasswordReset = user.IsPasswordReset
             };
         }
        
-        public async Task<string> ResetPassword(string token,string username, string password, [Service] UserManager<AppUser> userManager, [Service] IConfiguration config)
+        public async Task<UserResetPasswordResponse> ResetPassword(string token,string username, string password, [Service] UserManager<AppUser> userManager, [Service] IConfiguration config)
         {
             //if (password != confirmpassword) throw new GraphQLException("Passwords do not match");
 
-            var user = await userManager.FindByIdAsync(username);
+            var user = await userManager.FindByNameAsync(username);
             if (user == null) throw new GraphQLException("User does not exist");
 
             var result = await userManager.ResetPasswordAsync(user!,token, password);
             if (!result.Succeeded) throw new GraphQLException("Failed to reset password");
+            user.IsPasswordReset = true;
 
-
-            return "The password has been successfully reset";
+            return new UserResetPasswordResponse
+            {
+                message = "The password has been successfully reset",
+                IsPasswordReset = user.IsPasswordReset
+            };
         }
 
 

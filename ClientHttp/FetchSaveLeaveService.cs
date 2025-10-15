@@ -10,9 +10,11 @@ namespace attendance_tracking_backend.ClientHttp
 {
     public class FetchSaveLeaveService
     {
-        private HttpClient? httpClient;
-        private DatabaseContext dbcontext;
-        private string? leave_api_data;
+        private readonly HttpClient? httpClient;
+        private readonly DatabaseContext? dbcontext;
+        private readonly string? leave_api_data;
+
+        public FetchSaveLeaveService() { }
 
         public FetchSaveLeaveService(HttpClient _httpClient, DatabaseContext _dbcontext)
         {
@@ -42,29 +44,29 @@ namespace attendance_tracking_backend.ClientHttp
             
                 foreach (var dto in data)
                 {
-                    // Check if email already exists to avoid duplicates
-                    var existingLeave = await dbcontext.Leaves
+                        // Check if email already exists to avoid duplicates
+                    var existingLeave = await dbcontext!.Leaves
                     .FirstOrDefaultAsync(u => u.Email == dto.Email && DateTime.SpecifyKind((DateTime)u.StartDate!.Value, DateTimeKind.Utc) == DateTime.SpecifyKind((DateTime)dto.StartDate!.Value, DateTimeKind.Utc));
 
-                if (existingLeave != null) continue;
+                    if (existingLeave != null) continue;
 
-                var appUserId = await dbcontext.AppUsers.Where(u => u.Email == dto.Email).Select(u => u.Id).FirstOrDefaultAsync();
+                    var appUserId = await dbcontext.AppUsers.Where(u => u.Email == dto.Email).Select(u => u.Id).FirstOrDefaultAsync();
 
-                var leave = new Leave
-                {
-                    Email = dto.Email,
-                    EmployeeName = dto.EmployeeName,
-                    DaysRequested = dto.DaysRequested,
-                    StartDate = DateTime.SpecifyKind((DateTime)dto.StartDate!.Value, DateTimeKind.Utc),
-                    EndDate = DateTime.SpecifyKind((DateTime)dto.EndDate!.Value, DateTimeKind.Utc),
-                    ApprovalStatus = dto.ApprovalStatus,
-                    AppUserId = appUserId
-                };
+                    var leave = new Leave
+                    {
+                        Email = dto.Email,
+                        EmployeeName = dto.EmployeeName,
+                        DaysRequested = dto.DaysRequested,
+                        StartDate = DateTime.SpecifyKind((DateTime)dto.StartDate!.Value, DateTimeKind.Utc),
+                        EndDate = DateTime.SpecifyKind((DateTime)dto.EndDate!.Value, DateTimeKind.Utc),
+                        ApprovalStatus = dto.ApprovalStatus,
+                        AppUserId = appUserId
+                    };
 
-                    dbcontext.Leaves.Add(leave);
+                        dbcontext.Leaves.Add(leave);
                     
                 }
-                await dbcontext.SaveChangesAsync();
+                await dbcontext!.SaveChangesAsync();
 
             
         }

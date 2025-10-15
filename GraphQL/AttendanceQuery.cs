@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace attendance_tracking_backend.GraphQL
 {
-    [ExtendObjectType("Query")]
+    [ExtendObjectType(OperationTypeNames.Query)]
     public class AttendanceQuery
     {
         [UseProjection, UseFiltering,UseSorting]

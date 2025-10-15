@@ -7,6 +7,7 @@ using System;
 
 namespace attendance_tracking_backend.GraphQL
 {
+    [ExtendObjectType(OperationTypeNames.Query)]
     public class UserQuery
     {
         //User Queries ******************************

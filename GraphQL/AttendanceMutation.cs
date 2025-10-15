@@ -1,6 +1,6 @@
 ﻿namespace attendance_tracking_backend.GraphQL
 {
-    [ExtendObjectType("Mutation")]
+    //[ExtendObjectType("Mutation")]
     public class AttendanceMutation
     {
     }
