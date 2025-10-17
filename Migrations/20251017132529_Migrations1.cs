@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace attendance_tracking_backend.Migrations
 {
     /// <inheritdoc />
-    public partial class Migration1 : Migration
+    public partial class Migrations1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -215,29 +215,6 @@ namespace attendance_tracking_backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ExitLogs",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ExitTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EntryTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    TotalExitTime = table.Column<int>(type: "integer", nullable: false),
-                    CurrentDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    AppUserId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ExitLogs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ExitLogs_AspNetUsers_AppUserId",
-                        column: x => x.AppUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Leaves",
                 columns: table => new
                 {
@@ -306,6 +283,35 @@ namespace attendance_tracking_backend.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "EntryExitLogs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ExitTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    EntryTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    TotalExitTime = table.Column<int>(type: "integer", nullable: true),
+                    CurrentDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    AppUserId = table.Column<int>(type: "integer", nullable: true),
+                    AttendanceId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EntryExitLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EntryExitLogs_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_EntryExitLogs_Attendances_AttendanceId",
+                        column: x => x.AttendanceId,
+                        principalTable: "Attendances",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
@@ -369,9 +375,14 @@ namespace attendance_tracking_backend.Migrations
                 column: "AppUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExitLogs_AppUserId",
-                table: "ExitLogs",
+                name: "IX_EntryExitLogs_AppUserId",
+                table: "EntryExitLogs",
                 column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EntryExitLogs_AttendanceId",
+                table: "EntryExitLogs",
+                column: "AttendanceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Leaves_AppUserId",
@@ -411,10 +422,7 @@ namespace attendance_tracking_backend.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Attendances");
-
-            migrationBuilder.DropTable(
-                name: "ExitLogs");
+                name: "EntryExitLogs");
 
             migrationBuilder.DropTable(
                 name: "Leaves");
@@ -427,6 +435,9 @@ namespace attendance_tracking_backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Attendances");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

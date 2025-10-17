@@ -1,5 +1,4 @@
 ﻿using attendance_tracking_backend;
-using Hangfire.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 

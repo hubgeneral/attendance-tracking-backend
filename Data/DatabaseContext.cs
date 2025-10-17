@@ -17,12 +17,9 @@ namespace attendance_tracking_backend.Data
         public DbSet<Leave> Leaves { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<Request> Requests { get; set; }
-        public DbSet<ExitLog> ExitLogs { get; set; }        
+        public DbSet<EntryExitLog> EntryExitLogs { get; set; }        
         public DbSet<ActivityLogger> ActivityLoggers { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-
-
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -62,15 +59,22 @@ namespace attendance_tracking_backend.Data
                 .WithMany(u => u.Attendances)
                 .HasForeignKey(a => a.AppUserId);
 
+            modelBuilder.Entity<EntryExitLog>()
+               .HasOne(e => e.User)
+               .WithMany(u => u.EntryExitLogs)
+               .HasForeignKey(e => e.AppUserId);
+
+            modelBuilder.Entity<EntryExitLog>()
+                .HasOne(e => e.Attendance)
+                .WithMany(a => a.EntryExitLogs)
+                .HasForeignKey(e => e.AttendanceId);
+
             modelBuilder.Entity<Request>()
                 .HasOne(r => r.User)
                 .WithMany(u => u.Requests)
                 .HasForeignKey(r => r.AppUserId);
 
-            modelBuilder.Entity<ExitLog>()
-                .HasOne(e => e.User)
-                .WithMany(u => u.ExitLogs)
-                .HasForeignKey(e => e.AppUserId);
+           
 
 
             modelBuilder.Entity<ActivityLogger>()

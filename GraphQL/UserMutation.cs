@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
+
 namespace attendance_tracking_backend.GraphQL
 {
     [ExtendObjectType(OperationTypeNames.Mutation)]
@@ -135,7 +136,6 @@ namespace attendance_tracking_backend.GraphQL
                 IsPasswordReset = user.IsPasswordReset
             };
         }
-
 
         //Creae User
         public async Task<AppUser> CreateUser(

@@ -1,6 +1,8 @@
 using attendance_tracking_backend.ClientHttp;
 using attendance_tracking_backend.Data;
 using attendance_tracking_backend.GraphQL;
+using attendance_tracking_backend.Services;
+using FluentScheduler;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +14,8 @@ namespace attendance_tracking_backend
 {
     public class Program
     {
+        public static IServiceProvider? ServiceProvider { get; private set; }
+
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -68,10 +72,11 @@ namespace attendance_tracking_backend
 
             var app = builder.Build();
 
-           
+            // After var app = builder.Build();
+            Program.ServiceProvider = app.Services;
+
             using (var scope = app.Services.CreateScope())
             {
- 
                 // fetch and store employee data
                 var apiService = scope.ServiceProvider.GetRequiredService<UserApiService>();
                 var dataService = scope.ServiceProvider.GetRequiredService<UserDataService>();
@@ -85,6 +90,13 @@ namespace attendance_tracking_backend
                 Console.WriteLine(JsonSerializer.Serialize(leave_data));
                 await leaveService.StoreLeaveDataAsync(leave_data);
             }
+
+            //Initialize FluentScheduler AFTER ServiceProvider is available
+            JobManager.Initialize(new LeaveJobRegistry());
+            JobManager.JobException += info =>
+            {
+                Console.WriteLine($"[Scheduler Error] {info.Exception.Message}");
+            };
 
             // Middlewares
             if (app.Environment.IsDevelopment())

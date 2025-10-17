@@ -25,10 +25,10 @@ namespace attendance_tracking_backend.Data
         public ICollection<Attendance>? Attendances { set; get; }
         public ICollection<Request>? Requests { set; get; }
         public ICollection<ActivityLogger>? ActivityLoggers { set; get; }
-        public ICollection<ExitLog>? ExitLogs { set; get; } 
-        public ICollection<AppUserRole> UserRoles { get; set; } = new List<AppUserRole>();
+        public ICollection<EntryExitLog>? EntryExitLogs { set; get; } 
+        public ICollection<AppUserRole> UserRoles { get; set; } = [];
 
-        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
     }
 
     public class AppRole : IdentityRole<int> {
@@ -36,7 +36,7 @@ namespace attendance_tracking_backend.Data
         public AppRole() { }
         public AppRole(string roleName) : base(roleName){}
 
-        public ICollection<AppUserRole> UserRoles { get; set; } = new List<AppUserRole>();
+        public ICollection<AppUserRole> UserRoles { get; set; } = [];
     }
 
     public class AppUserRole : IdentityUserRole<int>
@@ -57,6 +57,22 @@ namespace attendance_tracking_backend.Data
         public DateOnly? CurrentDate { set; get; }
         public int AppUserId {  get; set; }
         public AppUser? User { get; set; }
+        public ICollection<EntryExitLog> EntryExitLogs { get; set; } = [];
+    }
+
+    public class EntryExitLog
+    {
+        [Key]
+        public int Id { get; set; }
+        public DateTime? ExitTime { get; set; }
+        public DateTime? EntryTime { get; set; }
+        public int? TotalExitTime { get; set; }
+        public DateOnly? CurrentDate { get; set; }
+        public int? AppUserId { get; set; }
+        public AppUser? User { set; get; }
+
+        public int AttendanceId { get; set; }
+        public Attendance? Attendance { get; set; }
     }
 
     public class RefreshToken
@@ -93,17 +109,7 @@ namespace attendance_tracking_backend.Data
         public AppUser? User { set; get; }
     }
   
-    public class ExitLog
-    {
-        [Key]
-        public int Id { get; set; }
-        public DateTime ExitTime { get; set; }
-        public DateTime EntryTime { get; set; }
-        public int TotalExitTime { get; set; }       
-        public DateOnly CurrentDate { get; set; }
-        public int AppUserId { get; set; }
-        public AppUser? User { set; get; }
-    }
+
 
     public class Leave
     {
