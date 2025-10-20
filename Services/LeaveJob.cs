@@ -28,7 +28,7 @@ namespace attendance_tracking_backend.Services
 
             var onLeaveUsers = dbcontext.Leaves
                 .Where(l => l.StartDate.HasValue && l.EndDate.HasValue && DateOnly.FromDateTime(l.StartDate.Value.ToUniversalTime()) <= currentDate && DateOnly.FromDateTime(l.EndDate.Value.ToUniversalTime()) >= currentDate && l.ApprovalStatus == "Approved")
-                .Select(l => l.AppUserId).Distinct() .ToList();
+                .Select(l => l.AppUserId).Distinct().ToList();
 
             foreach (var userId in onLeaveUsers)
             {

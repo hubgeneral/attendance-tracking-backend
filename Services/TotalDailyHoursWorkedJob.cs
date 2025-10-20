@@ -8,8 +8,11 @@ namespace attendance_tracking_backend.Services
     {
             public async void Execute()
             {
-                using var dbcontext = new DatabaseContext();
-                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            using var scope = Program.ServiceProvider!.CreateScope();
+            var dbcontext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
                 // Step 1: Fetch all EntryExitLogs for today with valid ExitTime
                 var groupedLogs = await dbcontext.EntryExitLogs.Where(e => e.CurrentDate == today && e.ExitTime != null)

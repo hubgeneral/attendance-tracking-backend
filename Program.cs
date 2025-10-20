@@ -14,7 +14,7 @@ namespace attendance_tracking_backend
 {
     public class Program
     {
-        public static IServiceProvider? ServiceProvider { get; private set; }
+        public static IServiceProvider? ServiceProvider { get; private set; } // variable for accessing services.
 
         public static async Task Main(string[] args)
         {
@@ -31,11 +31,11 @@ namespace attendance_tracking_backend
             .AddEntityFrameworkStores<DatabaseContext>()
             .AddDefaultTokenProviders();
 
-            // JWT Authentication
+            //JWT Authentication
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    options.RequireHttpsMetadata = false; // for localhost
+                    options.RequireHttpsMetadata = false; //for localhost
                     options.SaveToken = true;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
@@ -48,7 +48,7 @@ namespace attendance_tracking_backend
                 });
 
             builder.Services.AddAuthorization();
-            // Http Clients and Services
+            //Http Clients and Services
             builder.Services.AddHttpClient<UserApiService>();
             builder.Services.AddHttpClient<FetchSaveLeaveService>();
             builder.Services.AddScoped<UserApiService>();
@@ -70,8 +70,9 @@ namespace attendance_tracking_backend
             // CORS : old way of implementing cors
             /*  builder.Services.AddCors(options =>
               {
-                  options.AddPolicy("AllowAll",p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+                 options.AddPolicy("AllowAll",p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
               });*/
+
             builder.Services.AddCors();
 
             var app = builder.Build();
