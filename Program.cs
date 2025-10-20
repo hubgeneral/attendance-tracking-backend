@@ -65,12 +65,18 @@ namespace attendance_tracking_backend
                 .AddProjections()
                 .AddFiltering()
                 .AddSorting();
-               //.AddType<UserType>() // optional
+            //.AddType<UserType>() // optional
 
-            // CORS
+            // CORS : old way of implementing cors
+            /*  builder.Services.AddCors(options =>
+              {
+                  options.AddPolicy("AllowAll",p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+              });*/
             builder.Services.AddCors();
 
             var app = builder.Build();
+
+            app.UseCors("AllowAll"); //Use Cors
 
             // After var app = builder.Build();
             Program.ServiceProvider = app.Services;
@@ -93,6 +99,7 @@ namespace attendance_tracking_backend
 
             //Initialize FluentScheduler AFTER ServiceProvider is available
             JobManager.Initialize(new LeaveJobRegistry());
+            JobManager.Initialize(new TotalDailyHoursWorkedRegistry());
             JobManager.JobException += info =>
             {
                 Console.WriteLine($"[Scheduler Error] {info.Exception.Message}");
