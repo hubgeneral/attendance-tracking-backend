@@ -38,6 +38,7 @@ namespace attendance_tracking_backend.DTO
         public string? AccessToken { get; set; }   // add token here
         public string? RefreshToken { get; set; }   // add token here
         public bool IsPasswordReset { get; set; }
+        public string? ResetToken { get; set; }
     }
 
 

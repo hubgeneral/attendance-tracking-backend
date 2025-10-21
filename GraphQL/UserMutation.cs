@@ -1,6 +1,7 @@
 ﻿using attendance_tracking_backend.Data;
 using attendance_tracking_backend.DTO;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql.PostgresTypes;
@@ -63,6 +64,17 @@ namespace attendance_tracking_backend.GraphQL
             await dbcontext.SaveChangesAsync();
 
 
+            var resetToken = "";
+            var encodedToken = "";
+
+            if (!user.IsPasswordReset)
+            {
+                 resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
+                 encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(resetToken));
+       
+            }
+
+
             return new UserLoginResponse
             {
                 AccessToken = accessTokenString,
@@ -70,7 +82,8 @@ namespace attendance_tracking_backend.GraphQL
                 Id = user.Id.ToString(),
                 UserName = user.UserName,
                 Role = userRole.Name,
-                IsPasswordReset = user.IsPasswordReset
+                IsPasswordReset = user.IsPasswordReset,
+                ResetToken = encodedToken
             };
         }
         
@@ -126,9 +139,19 @@ namespace attendance_tracking_backend.GraphQL
             var user = await userManager.FindByNameAsync(username);
             if (user == null) throw new GraphQLException("User does not exist");
 
-            var result = await userManager.ResetPasswordAsync(user!,token, password);
-            if (!result.Succeeded) throw new GraphQLException("Failed to reset password");
+
+            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token)); //decode encoded token
+            var result = await userManager.ResetPasswordAsync(user!, decodedToken, password);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new GraphQLException($"Failed to reset password: {errors}");
+            }
+
             user.IsPasswordReset = true;
+
+            await userManager.UpdateAsync(user);
 
             return new UserResetPasswordResponse
             {
