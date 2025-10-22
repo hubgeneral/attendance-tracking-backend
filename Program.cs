@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
-
 namespace attendance_tracking_backend
 {
     public class Program
@@ -52,7 +51,8 @@ namespace attendance_tracking_backend
             builder.Services.AddHttpClient<UserApiService>();
             builder.Services.AddHttpClient<FetchSaveLeaveService>();
             builder.Services.AddScoped<UserApiService>();
-           builder.Services.AddScoped<UserDataService>();
+            builder.Services.AddScoped<UserDataService>();
+           
 
             // GraphQL
             builder.Services.AddGraphQLServer()
@@ -61,6 +61,7 @@ namespace attendance_tracking_backend
                     .AddTypeExtension<AttendanceQuery>()
                 .AddMutationType<Mutation>()   //root mutationtype
                     .AddTypeExtension<UserMutation>()
+                    .AddTypeExtension<AttendanceMutation>()
                     .AddTypeExtension<GeoFenceMutation>()
                 .AddProjections()
                 .AddFiltering()
@@ -74,11 +75,8 @@ namespace attendance_tracking_backend
               });*/
 
             builder.Services.AddCors();
-
             var app = builder.Build();
-
             app.UseCors("AllowAll"); //Use Cors
-
             // After var app = builder.Build();
             Program.ServiceProvider = app.Services;
 
@@ -103,11 +101,11 @@ namespace attendance_tracking_backend
             JobManager.Initialize(new TotalDailyHoursWorkedRegistry());
             JobManager.JobException += info =>
             {
-                Console.WriteLine($"[Scheduler Error] {info.Exception.Message}");
+               Console.WriteLine($"[Scheduler Error] {info.Exception.Message}");
             };
 
             // Middlewares
-            if (app.Environment.IsDevelopment())
+            if(app.Environment.IsDevelopment())
             {
                 app.UseCors(policy => policy
                     .AllowAnyOrigin()

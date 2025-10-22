@@ -14,11 +14,12 @@ using System.Text;
 namespace attendance_tracking_backend.GraphQL
 {
     [ExtendObjectType(OperationTypeNames.Mutation)]
+
     public class UserMutation   //resolvers
     {
-        //User Mutations ******************************
-
+        //User Mutations ******************
         //Login with username and password
+
         public async Task<UserLoginResponse> Login(string username, string password, [Service] SignInManager<AppUser> signInManager, [Service] UserManager<AppUser> userManager, [Service] DatabaseContext dbcontext, [Service] IConfiguration config)
         {
             //Find
@@ -100,7 +101,7 @@ namespace attendance_tracking_backend.GraphQL
                     new Claim("Id", user.Id.ToString() ?? ""),
                     new Claim("username", user.UserName ?? ""),
                     new Claim("userRole", userRole!.Name!)
-                };
+                  };
 
             //Read key from config
             var secret = config["Jwt:Key"];
@@ -121,6 +122,16 @@ namespace attendance_tracking_backend.GraphQL
                 AppUserId = user.Id
             };
 
+            var resetToken = "";
+            var encodedToken = "";
+
+            if (!user.IsPasswordReset)
+            {
+                resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
+                encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(resetToken));
+
+            }
+
             return new UserLoginResponse
             {
                 AccessToken = accessTokenString,
@@ -128,7 +139,8 @@ namespace attendance_tracking_backend.GraphQL
                 Id = user.Id.ToString(),
                 UserName = user.UserName,
                 Role = userRole.Name,
-                IsPasswordReset = user.IsPasswordReset
+                IsPasswordReset = user.IsPasswordReset,
+                ResetToken = encodedToken,
             };
         }
        
@@ -139,9 +151,8 @@ namespace attendance_tracking_backend.GraphQL
             var user = await userManager.FindByNameAsync(username);
             if (user == null) throw new GraphQLException("User does not exist");
 
-
             var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token)); //decode encoded token
-            var result = await userManager.ResetPasswordAsync(user!, decodedToken, password);
+            var result = await userManager.ResetPasswordAsync(user!,decodedToken, password);
 
             if (!result.Succeeded)
             {
@@ -150,7 +161,6 @@ namespace attendance_tracking_backend.GraphQL
             }
 
             user.IsPasswordReset = true;
-
             await userManager.UpdateAsync(user);
 
             return new UserResetPasswordResponse
@@ -159,7 +169,6 @@ namespace attendance_tracking_backend.GraphQL
                 IsPasswordReset = user.IsPasswordReset
             };
         }
-
         //Creae User
         public async Task<AppUser> CreateUser(
             string employeeName,
@@ -224,70 +233,7 @@ namespace attendance_tracking_backend.GraphQL
             return true;
         }
 
- // Attendance Mutations ****************************************************************/
-
-        public async Task<Attendance> CreateAttendance(
-                DateTime clockin,
-                DateTime clockout,
-                int totalhoursworked,
-                string status,
-                DateOnly currentdate,
-                int appuserid,
-                [Service] DatabaseContext dbcontext
-            )
-        {
-            var attendance = new Attendance()
-            {
-                ClockIn = clockin,
-                ClockOut = clockout,
-                TotalHoursWorked = totalhoursworked ,
-                Status =  status,
-                CurrentDate = currentdate ,
-                AppUserId = appuserid 
-            };
-
-            dbcontext.Attendances.Add(attendance);
-            await dbcontext.SaveChangesAsync();
-            return attendance;
-        }
-
-        public async Task<Attendance?> UpdateAttendance(
-             DateTime clockin,
-             DateTime clockout,
-             int totalhoursworked,
-             string status,
-             DateOnly currentdate,
-             int appuserid,
-             [Service] DatabaseContext dbcontext
-         )
-        {
-            var attendance = dbcontext.Attendances.FirstOrDefault(a=> a.AppUserId == appuserid && a.CurrentDate == currentdate);
-
-            if (attendance == null) return null;
-
-            attendance.ClockIn = clockin;
-            attendance.ClockOut = clockout;
-            attendance.TotalHoursWorked = totalhoursworked;
-            attendance.Status = status;
-            attendance.CurrentDate = currentdate;
-            attendance.AppUserId = appuserid;
-
-            await dbcontext.SaveChangesAsync();
-            return attendance;
-        }
-
-        public async Task<bool> DeleteAttendance(int id , [Service] DatabaseContext dbcontext)
-        {
-            var attendance = dbcontext.Attendances.Find(id);
-            if (attendance == null) return false;
-
-            dbcontext.Attendances.Remove(attendance);
-            await dbcontext.SaveChangesAsync();
-            return true;
-        }
-
-//Clocking Mutations ******************************************************************/
-
+ 
        
     }
 }
