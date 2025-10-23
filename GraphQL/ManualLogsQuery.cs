@@ -9,5 +9,11 @@ namespace attendance_tracking_backend.GraphQL
     [ExtendObjectType(OperationTypeNames.Query)]
     public class ManualLogsQuery
     {
+        [UseProjection,UseFiltering,UseSorting]
+       public IQueryable<RequestLog> GetManualLogs([Service] DatabaseContext dbcontext) {
+
+           return  dbcontext.RequestLogs;
+        }
     }
 }
+

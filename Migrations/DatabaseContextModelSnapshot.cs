@@ -110,33 +110,6 @@ namespace attendance_tracking_backend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("attendance_tracking_backend.Data.ActivityLogger", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ActivityDescription")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ActivityLog")
-                        .HasColumnType("text");
-
-                    b.Property<int>("AppUserId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("TimeOfDay")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId");
-
-                    b.ToTable("ActivityLoggers");
-                });
-
             modelBuilder.Entity("attendance_tracking_backend.Data.AppRole", b =>
                 {
                     b.Property<int>("Id")
@@ -421,7 +394,7 @@ namespace attendance_tracking_backend.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("attendance_tracking_backend.Data.Request", b =>
+            modelBuilder.Entity("attendance_tracking_backend.Data.RequestLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -429,20 +402,35 @@ namespace attendance_tracking_backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ActionBy")
+                        .HasColumnType("text");
+
                     b.Property<int>("AppUserId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("ApprovalStatus")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("TimeOfDay")
+                    b.Property<DateTime?>("ClockIn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ClockOut")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EmployeeName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("TimeOfDay")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AppUserId");
 
-                    b.ToTable("Requests");
+                    b.ToTable("RequestLogs");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -479,17 +467,6 @@ namespace attendance_tracking_backend.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("attendance_tracking_backend.Data.ActivityLogger", b =>
-                {
-                    b.HasOne("attendance_tracking_backend.Data.AppUser", "User")
-                        .WithMany("ActivityLoggers")
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("attendance_tracking_backend.Data.AppUserRole", b =>
@@ -561,10 +538,10 @@ namespace attendance_tracking_backend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("attendance_tracking_backend.Data.Request", b =>
+            modelBuilder.Entity("attendance_tracking_backend.Data.RequestLog", b =>
                 {
                     b.HasOne("attendance_tracking_backend.Data.AppUser", "User")
-                        .WithMany("Requests")
+                        .WithMany("RequestLogs")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -579,8 +556,6 @@ namespace attendance_tracking_backend.Migrations
 
             modelBuilder.Entity("attendance_tracking_backend.Data.AppUser", b =>
                 {
-                    b.Navigation("ActivityLoggers");
-
                     b.Navigation("Attendances");
 
                     b.Navigation("EntryExitLogs");
@@ -589,7 +564,7 @@ namespace attendance_tracking_backend.Migrations
 
                     b.Navigation("RefreshTokens");
 
-                    b.Navigation("Requests");
+                    b.Navigation("RequestLogs");
 
                     b.Navigation("UserRoles");
                 });

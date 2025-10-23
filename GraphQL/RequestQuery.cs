@@ -8,15 +8,15 @@ namespace attendance_tracking_backend.GraphQL
     public class RequestQuery
     {
         [UseProjection, UseFiltering, UseSorting]
-        public IQueryable<Request> GetRequests([Service] DatabaseContext dbcontext) {
+        public IQueryable<RequestLog> GetRequests([Service] DatabaseContext dbcontext) {
 
-            return dbcontext.Requests;
+            return dbcontext.RequestLogs;
         }
 
-        public IQueryable<Request> GetRequestByUserId(int id, [Service] DatabaseContext dbcontext)
+        public IQueryable<RequestLog> GetRequestByUserId(int id, [Service] DatabaseContext dbcontext)
         {
             var user = dbcontext.Users.Where(u=> u.Id == id).FirstOrDefault();
-            return dbcontext.Requests.Where(r => r.AppUserId == user!.Id);
+            return dbcontext.RequestLogs.Where(r => r.AppUserId == user!.Id);
         }
 
     }

@@ -48,6 +48,7 @@ namespace attendance_tracking_backend.ClientHttp
                         Email = dto.Email,
                         StaffId = dto.StaffId,
                         UserName = dto.StaffId,
+                        EmployeeType = dto.Role,
                         IsPasswordReset = false
                     };
 

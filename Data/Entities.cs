@@ -23,11 +23,9 @@ namespace attendance_tracking_backend.Data
         public string? EmployeeType { set; get; }
         public ICollection<Leave>? Leaves { set; get; }
         public ICollection<Attendance>? Attendances { set; get; }
-        public ICollection<Request>? Requests { set; get; }
-        public ICollection<ActivityLogger>? ActivityLoggers { set; get; }
+        public ICollection<RequestLog>? RequestLogs { set; get; }
         public ICollection<EntryExitLog>? EntryExitLogs { set; get; } 
         public ICollection<AppUserRole> UserRoles { get; set; } = [];
-
         public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
     }
 
@@ -35,7 +33,6 @@ namespace attendance_tracking_backend.Data
 
         public AppRole() { }
         public AppRole(string roleName) : base(roleName){}
-
         public ICollection<AppUserRole> UserRoles { get; set; } = [];
     }
 
@@ -70,11 +67,27 @@ namespace attendance_tracking_backend.Data
         public DateOnly? CurrentDate { get; set; }
         public int? AppUserId { get; set; }
         public AppUser? User { set; get; }
-
         public int AttendanceId { get; set; }
         public Attendance? Attendance { get; set; }
     }
 
+  
+    public class RequestLog
+    {
+        public int Id { set; get; }
+        public string? EmployeeName { set; get; }
+        public string? Reason { set; get; }
+        public DateTime? TimeOfDay { set; get; }
+        public DateTime? ClockIn { get; set; }
+        public DateTime? ClockOut { get; set; }
+        public string? ApprovalStatus { set; get; }
+         public string? ActionBy { get; set; }
+
+        public int AppUserId { get; set; }
+        public AppUser? User { get; set; }
+
+
+    }
     public class RefreshToken
     {
         [Key]
@@ -87,28 +100,7 @@ namespace attendance_tracking_backend.Data
         public AppUser? User { get; set; }
     }
 
-    public class Request
-    {
-        public int Id { set; get; }
-        public string? Description {  set; get; }
-        public DateTime TimeOfDay { set; get; }
-        public int AppUserId {  get; set; }
-        public AppUser? User {  get; set; }
-
-    }
-
-    public class ActivityLogger
-    {
-        [Key]
-        public int Id { set; get; }
-        public string? ActivityLog { set; get; }
-        public String? ActivityDescription { set; get; }
-        public DateTime TimeOfDay { set; get; }
-
-        public int AppUserId { get; set; }
-        public AppUser? User { set; get; }
-    }
-  
+   
 
 
     public class Leave

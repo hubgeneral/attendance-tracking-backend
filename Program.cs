@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
+ 
+
 namespace attendance_tracking_backend
 {
     public class Program
@@ -61,10 +63,13 @@ namespace attendance_tracking_backend
                     .AddTypeExtension<AttendanceQuery>()
                     .AddTypeExtension<DashboardQuery>()
                     .AddTypeExtension<ManualLogsQuery>()
+                    .AddTypeExtension<RequestQuery>()
                 .AddMutationType<Mutation>()   //root mutationtype
                     .AddTypeExtension<UserMutation>()
                     .AddTypeExtension<AttendanceMutation>()
                     .AddTypeExtension<GeoFenceMutation>()
+                    .AddTypeExtension<ManualLogsMutation>()
+                    .AddTypeExtension<RequestMutation>()
                 .AddProjections()
                 .AddFiltering()
                 .AddSorting();

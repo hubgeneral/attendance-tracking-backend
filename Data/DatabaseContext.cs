@@ -7,7 +7,6 @@ namespace attendance_tracking_backend.Data
     public class DatabaseContext : IdentityDbContext<AppUser, AppRole, int,IdentityUserClaim<int>, AppUserRole, IdentityUserLogin<int>, IdentityRoleClaim<int>, IdentityUserToken<int>>   //IdentityDbContext<AppUser,IdentityRole<int>, int> //DbContext
     {
         public DatabaseContext() { }
-
          public DatabaseContext(DbContextOptions<DatabaseContext> options)
             : base(options) { }
 
@@ -16,9 +15,9 @@ namespace attendance_tracking_backend.Data
         public override DbSet<AppUserRole> UserRoles { get; set; }
         public DbSet<Leave> Leaves { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
-        public DbSet<Request> Requests { get; set; }
+        public DbSet<RequestLog> RequestLogs { get; set; }
         public DbSet<EntryExitLog> EntryExitLogs { get; set; }        
-        public DbSet<ActivityLogger> ActivityLoggers { get; set; }
+       // public DbSet<ManualLog> ManualLogs { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -69,18 +68,16 @@ namespace attendance_tracking_backend.Data
                 .WithMany(a => a.EntryExitLogs)
                 .HasForeignKey(e => e.AttendanceId);
 
-            modelBuilder.Entity<Request>()
+            modelBuilder.Entity<RequestLog>()
                 .HasOne(r => r.User)
-                .WithMany(u => u.Requests)
+                .WithMany(u => u.RequestLogs)
                 .HasForeignKey(r => r.AppUserId);
 
            
-
-
-            modelBuilder.Entity<ActivityLogger>()
+           /* modelBuilder.Entity<ManualLog>()
                 .HasOne(a => a.User)
-                .WithMany(u => u.ActivityLoggers)
-                .HasForeignKey(a => a.AppUserId);
+                .WithMany(u => u.ManualLogs)
+                .HasForeignKey(a => a.AppUserId);*/
 
             modelBuilder.Entity<RefreshToken>()
               .HasOne(r => r.User)
@@ -92,7 +89,7 @@ namespace attendance_tracking_backend.Data
             modelBuilder.Entity<AppUser>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
-               // .HasFilter("[Email] IS NOT NULL");
+               //.HasFilter("[Email] IS NOT NULL");
 
         }
     }
