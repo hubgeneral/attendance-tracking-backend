@@ -59,6 +59,8 @@ namespace attendance_tracking_backend
                 .AddQueryType<Query>() //root querytype
                     .AddTypeExtension<UserQuery>()
                     .AddTypeExtension<AttendanceQuery>()
+                    .AddTypeExtension<DashboardQuery>()
+                    .AddTypeExtension<ManualLogsQuery>()
                 .AddMutationType<Mutation>()   //root mutationtype
                     .AddTypeExtension<UserMutation>()
                     .AddTypeExtension<AttendanceMutation>()
