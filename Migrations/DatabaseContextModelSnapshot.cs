@@ -417,6 +417,9 @@ namespace attendance_tracking_backend.Migrations
                     b.Property<DateTime?>("ClockOut")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateOnly?>("CurrentDate")
+                        .HasColumnType("date");
+
                     b.Property<string>("EmployeeName")
                         .HasColumnType("text");
 
