@@ -11,6 +11,102 @@ namespace attendance_tracking_backend.GraphQL
  
     public class DashboardQuery
     {
+        public DashboardTotalSummary GetDashboardTotalStats(
+            DateOnly? startDate,
+            DateOnly? endDate,
+            [Service] DatabaseContext dbcontext)
+        {
+
+
+            var utcToday = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            var start = startDate ?? utcToday;
+
+            var end = endDate ?? utcToday;
+            var startDateTime = DateTime.SpecifyKind(start.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+            var endDateTime = DateTime.SpecifyKind(end.ToDateTime(TimeOnly.MaxValue), DateTimeKind.Utc);
+
+            var totalEmployees = dbcontext.Users.Count();
+
+            var employeesClockedIn = dbcontext.Attendances
+                .Where(a => a.ClockIn != null && a.CurrentDate >= start && a.CurrentDate <= end)
+                .Select(a => a.AppUserId)
+                .Distinct()
+                .Count();
+
+            var employeesClockedOut = dbcontext.Attendances
+                .Where(a => a.ClockOut != null && a.CurrentDate >= start && a.CurrentDate <= end)
+                .Select(a => a.AppUserId)
+                .Distinct()
+                .Count();
+
+            var totalLeaves = dbcontext.Leaves.
+                Where(l => l.StartDate <= startDateTime && l.EndDate >= endDateTime && l.ApprovalStatus == "Approved")
+                .Select(l=>l.AppUserId)
+                .Distinct()
+                .Count();
+
+            var totalAbsent = totalEmployees - employeesClockedIn-totalLeaves;
+
+            return new DashboardTotalSummary
+            {
+                TotalEmployees = totalEmployees,
+                EmployeesClocledIn = employeesClockedIn,
+                EmployeesClocledOut = employeesClockedOut,
+                TotalLeaves = totalLeaves,
+                TotalAbsent = totalAbsent
+            };
+        }
+
+        public class DashboardTotalSummary
+        {
+            public int TotalEmployees { get; set; }
+            public int EmployeesClocledIn { get; set; }
+            public int EmployeesClocledOut { get; set; }
+            public int TotalAbsent { get; set; }
+            public int TotalLeaves { get; set; }
+
+        }
+        public class AverageClockTimeResult
+        {
+            public DateTime? AverageClockIn { get; set; }
+            public DateTime? AverageClockOut { get; set; }
+        }
+
+        public AverageClockTimeResult AverageClockTime(
+            DateOnly? startDate,
+            DateOnly? endDate,
+            [Service] DatabaseContext dbcontext)
+        {
+            var utcToday = DateOnly.FromDateTime(DateTime.UtcNow);
+            var start = startDate ?? utcToday;
+            var end = endDate ?? utcToday;
+
+            var clockInTimes = dbcontext.Attendances
+                .Where(a => a.ClockIn != null && a.CurrentDate >= start && a.CurrentDate <= end)
+                .Select(a => a.ClockIn.Value.TimeOfDay.TotalMilliseconds)
+                .ToList();
+
+            var clockOutTimes = dbcontext.Attendances
+                .Where(a => a.ClockOut != null && a.CurrentDate >= start && a.CurrentDate <= end)
+                .Select(a => a.ClockOut.Value.TimeOfDay.TotalMilliseconds)
+                .ToList();
+
+            DateTime? averageClockIn = null;
+            DateTime? averageClockOut = null;
+
+            if (clockInTimes.Any())
+                averageClockIn = DateTime.Today.Add(TimeSpan.FromMilliseconds(clockInTimes.Average()));
+
+            if (clockOutTimes.Any())
+                averageClockOut = DateTime.Today.Add(TimeSpan.FromMilliseconds(clockOutTimes.Average()));
+                
+            return new AverageClockTimeResult
+            {
+                AverageClockIn = averageClockIn,
+                AverageClockOut = averageClockOut
+            };
+        }
 
         public IQueryable<RequestLog> GetRequestLogs(DateOnly startday,DateOnly stopdate , DatabaseContext dbcontext)
         {
