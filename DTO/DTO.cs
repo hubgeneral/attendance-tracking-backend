@@ -11,8 +11,6 @@ namespace attendance_tracking_backend.DTO
         public string? Email { set; get; }
         public string? EmployeeName { set; get; }
         public string? StaffId { set; get; }  //Username
-        public string? Role { set; get; }
-        public string? EmploymentType { set; get; }
     }
 
     //Leave Data
@@ -30,6 +28,7 @@ namespace attendance_tracking_backend.DTO
         public string? ApprovalStatus { set; get; }
     }
 
+
     public class UserLoginResponse
     {
        
@@ -42,10 +41,13 @@ namespace attendance_tracking_backend.DTO
         public string? ResetToken { get; set; }
     }
 
+
+
+
     public class UserForgotPasswordResponse
     {
-        public string? Id { get; set; }
         public string? Token { get; set; }   // add token here
+        public string? Id { get; set; }
         public string? Username { get; set; }
     }
 
@@ -57,8 +59,8 @@ namespace attendance_tracking_backend.DTO
 
     public class UserChangePassword
     {
-        public string? Id { get; set; }
         public string? Token { get; set; }   // add token here
+        public string? Id { get; set; }
         public string? Username { get; set; }
     }
 
@@ -75,48 +77,5 @@ namespace attendance_tracking_backend.DTO
         public string? Status { get; set; } 
 
 
-    }
-
-
-
-    //Dashboard DTOs
-    public class DashboardRequests
-    {
-        public int RequestId { set; get; }
-        public string? Description { set; get; }
-        public DateTime TimeOfDay { set; get; }
-        public string? EmployeeName { set; get; }
-    }
-
-    public class LateEmployees
-    {
-        public string? EmployeeName { set; get; }
-        public DateTime?  TimeOfDay { set; get; }       
-    }
-
-    public class PunctualEmployees
-    {
-        public string? EmployeeName { set; get; }
-        public DateTime? TimeOfDay { set; get; }
-    }
-
-    public class WorkingHours
-    {
-        public decimal TotalWorkingHours {  get; set; }
-        public decimal TotalOffHours {  get; set; } 
-
-    }
-
-    public class MostHoursWorkedByEmployee
-    {
-        public string? EmployeeName { set; get; }
-        public decimal? TotalWorkingHours { get; set; }
-
-    }
-
-    public class MostHoursWastedByEmployee
-    {
-        public string? EmployeeName { set; get; }
-        public decimal? TotalWastedHours { get; set; }
     }
 }

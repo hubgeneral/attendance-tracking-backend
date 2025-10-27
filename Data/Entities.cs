@@ -30,6 +30,7 @@ namespace attendance_tracking_backend.Data
     }
 
     public class AppRole : IdentityRole<int> {
+
         public AppRole() { }
         public AppRole(string roleName) : base(roleName){}
         public ICollection<AppUserRole> UserRoles { get; set; } = [];
@@ -69,6 +70,8 @@ namespace attendance_tracking_backend.Data
         public int AttendanceId { get; set; }
         public Attendance? Attendance { get; set; }
     }
+
+  
     public class RequestLog
     {
         public int Id { set; get; }
@@ -78,10 +81,12 @@ namespace attendance_tracking_backend.Data
         public DateTime? ClockIn { get; set; }
         public DateTime? ClockOut { get; set; }
         public string? ApprovalStatus { set; get; }
-        public string? ActionBy { get; set; }
-        public DateOnly? CurrentDate { get; set; }
+         public string? ActionBy { get; set; }
+
         public int AppUserId { get; set; }
         public AppUser? User { get; set; }
+
+
     }
     public class RefreshToken
     {
@@ -94,6 +99,9 @@ namespace attendance_tracking_backend.Data
         public int AppUserId { get; set; }
         public AppUser? User { get; set; }
     }
+
+   
+
 
     public class Leave
     {

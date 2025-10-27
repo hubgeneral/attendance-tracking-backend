@@ -253,7 +253,6 @@ namespace attendance_tracking_backend.Migrations
                     ClockOut = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     ApprovalStatus = table.Column<string>(type: "text", nullable: true),
                     ActionBy = table.Column<string>(type: "text", nullable: true),
-                    CurrentDate = table.Column<DateOnly>(type: "date", nullable: true),
                     AppUserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
