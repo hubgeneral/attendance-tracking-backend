@@ -12,7 +12,7 @@ using attendance_tracking_backend.Data;
 namespace attendance_tracking_backend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251024192927_Migration1")]
+    [Migration("20251023203517_Migration1")]
     partial class Migration1
     {
         /// <inheritdoc />
@@ -419,9 +419,6 @@ namespace attendance_tracking_backend.Migrations
 
                     b.Property<DateTime?>("ClockOut")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateOnly?>("CurrentDate")
-                        .HasColumnType("date");
 
                     b.Property<string>("EmployeeName")
                         .HasColumnType("text");
