@@ -51,8 +51,8 @@ namespace attendance_tracking_backend.GraphQL
             return new DashboardTotalSummary
             {
                 TotalEmployees = totalEmployees,
-                EmployeesClocledIn = employeesClockedIn,
-                EmployeesClocledOut = employeesClockedOut,
+                EmployeesClockedIn = employeesClockedIn,
+                EmployeesClockedOut = employeesClockedOut,
                 TotalLeaves = totalLeaves,
                 TotalAbsent = totalAbsent
             };
@@ -61,8 +61,8 @@ namespace attendance_tracking_backend.GraphQL
         public class DashboardTotalSummary
         {
             public int TotalEmployees { get; set; }
-            public int EmployeesClocledIn { get; set; }
-            public int EmployeesClocledOut { get; set; }
+            public int EmployeesClockedIn { get; set; }
+            public int EmployeesClockedOut { get; set; }
             public int TotalAbsent { get; set; }
             public int TotalLeaves { get; set; }
 
@@ -106,6 +106,85 @@ namespace attendance_tracking_backend.GraphQL
                 AverageClockIn = averageClockIn,
                 AverageClockOut = averageClockOut
             };
+        }
+
+        public class GraphDataResults
+        {
+            public DayOfWeek Day { get; set; }
+            public int ClockedInCount { get; set; }
+            public int Absent { get; set; }
+            public int OnLeave { get; set; }
+        }
+
+        public IEnumerable<GraphDataResults> GraphData(
+    DateOnly? startDate,
+    DateOnly? endDate,
+    [Service] DatabaseContext dbcontext)
+        {
+            var utcToday = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            // Default to current work week (Monday–Friday)
+            var startOfWeek = utcToday.AddDays(-(int)utcToday.DayOfWeek + (utcToday.DayOfWeek == DayOfWeek.Sunday ? 1 : 0));
+            if (startOfWeek.DayOfWeek != DayOfWeek.Monday)
+                startOfWeek = utcToday.AddDays(-(int)utcToday.DayOfWeek + 1);
+
+            var start = startDate ?? startOfWeek;
+            var end = endDate ?? start.AddDays(4); // Friday
+
+            // Convert DateOnly to UTC DateTime
+            static DateTime AsUtcDate(DateOnly d, TimeOnly t) =>
+                DateTime.SpecifyKind(d.ToDateTime(t), DateTimeKind.Utc);
+
+            var results = Enumerable.Range(1, 5)
+                .Select(i => new GraphDataResults
+                {
+                    Day = (DayOfWeek)i,
+                    ClockedInCount = 0,
+                    Absent = 0,
+                    OnLeave = 0
+                })
+                .ToArray();
+
+            var totalEmployees = dbcontext.Users.Count();
+
+            for (var date = start; date <= end; date = date.AddDays(1))
+            {
+                if (date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+                    continue;
+
+                var dayOfWeek = date.DayOfWeek;
+                var result = results.First(r => r.Day == dayOfWeek);
+
+                // Convert current date boundaries to UTC
+                var dayStartUtc = AsUtcDate(date, TimeOnly.MinValue);
+                var dayEndUtc = AsUtcDate(date, TimeOnly.MaxValue);
+
+                // Count employees who clocked in (assuming CurrentDate is DateOnly)
+                var clockedIn = dbcontext.Attendances
+                    .Where(a => a.CurrentDate == date && a.ClockIn != null)
+                    .Select(a => a.AppUserId)
+                    .Distinct()
+                    .Count();
+
+                // dayStartUtc and dayEndUtc are DateTime with Kind = Utc
+                var onLeave = dbcontext.Leaves
+                    .Where(l =>
+                        l.ApprovalStatus == "Approved" &&
+                        l.StartDate <= dayEndUtc &&
+                        (l.EndDate ?? DateTime.MaxValue) >= dayStartUtc)   // treat null EndDate as open-ended
+                    .Select(l => l.AppUserId)
+                    .Distinct()
+                    .Count();
+
+
+                var absent = totalEmployees - (clockedIn + onLeave);
+
+                result.ClockedInCount = clockedIn;
+                result.OnLeave = onLeave;
+                result.Absent = absent;
+            }
+
+            return results.ToList();
         }
 
         public IQueryable<RequestLog> GetRequestLogs(DateOnly startday,DateOnly stopdate , DatabaseContext dbcontext)
