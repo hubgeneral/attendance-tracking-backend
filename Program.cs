@@ -54,8 +54,7 @@ namespace attendance_tracking_backend
             builder.Services.AddHttpClient<FetchSaveLeaveService>();
             builder.Services.AddScoped<UserApiService>();
             builder.Services.AddScoped<UserDataService>();
-           
-
+         
             // GraphQL
             builder.Services.AddGraphQLServer()
                 .AddQueryType<Query>() //root querytype
@@ -63,13 +62,13 @@ namespace attendance_tracking_backend
                     .AddTypeExtension<AttendanceQuery>()
                     .AddTypeExtension<DashboardQuery>()
                     .AddTypeExtension<ManualLogsQuery>()
-                    .AddTypeExtension<RequestQuery>()
+                    .AddTypeExtension<RequestLogsQuery>()
                 .AddMutationType<Mutation>()   //root mutationtype
                     .AddTypeExtension<UserMutation>()
                     .AddTypeExtension<AttendanceMutation>()
                     .AddTypeExtension<GeoFenceMutation>()
                     .AddTypeExtension<ManualLogsMutation>()
-                    .AddTypeExtension<RequestMutation>()
+                    .AddTypeExtension<RequestLogsMutation>()
                 .AddProjections()
                 .AddFiltering()
                 .AddSorting();

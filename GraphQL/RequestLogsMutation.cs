@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 namespace attendance_tracking_backend.GraphQL
 {
     [ExtendObjectType(OperationTypeNames.Mutation)]
-    public class RequestMutation
+    public class RequestLogsMutation
     {
         public async Task<string> CreateRequest(int userid, string reason ,[Service]DatabaseContext dbcontext)
         {

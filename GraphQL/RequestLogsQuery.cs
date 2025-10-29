@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore;
 namespace attendance_tracking_backend.GraphQL
 {
     [ExtendObjectType(OperationTypeNames.Query)]
-    public class RequestQuery
+    public class RequestLogsQuery
     {
         [UseProjection, UseFiltering, UseSorting]
-        public IQueryable<RequestLog> GetRequests([Service] DatabaseContext dbcontext) {
+        public IQueryable<RequestLog> GetRequestLogs([Service] DatabaseContext dbcontext) {
 
             return dbcontext.RequestLogs;
         }
 
-        public IQueryable<RequestLog> GetRequestByUserId(int id, [Service] DatabaseContext dbcontext)
+        public IQueryable<RequestLog> GetRequestLogsByUserId(int id, [Service] DatabaseContext dbcontext)
         {
             var user = dbcontext.Users.Where(u=> u.Id == id).FirstOrDefault();
             return dbcontext.RequestLogs.Where(r => r.AppUserId == user!.Id);
