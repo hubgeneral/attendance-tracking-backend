@@ -31,6 +31,8 @@ namespace attendance_tracking_backend.GraphQL
                AppUserId = employee.Id         
             };
 
+            dbcontext.RequestLogs.Add(newRequestLog);
+            await dbcontext.SaveChangesAsync();
 
             var attendance = await dbcontext.Attendances.FirstOrDefaultAsync(a => a.CurrentDate == today && a.AppUserId == employee.Id);
 
