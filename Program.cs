@@ -10,7 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
  
-
 namespace attendance_tracking_backend
 {
     public class Program
@@ -28,6 +27,8 @@ namespace attendance_tracking_backend
             {
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
+                options.Password.RequiredUniqueChars = 0;
+              
             })
             .AddEntityFrameworkStores<DatabaseContext>()
             .AddDefaultTokenProviders();
