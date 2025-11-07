@@ -68,13 +68,14 @@ namespace attendance_tracking_backend.GraphQL
             var resetToken = "";
             var encodedToken = "";
 
-            if (!user.IsPasswordReset)
-            {
-                 resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
-                 encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(resetToken));
-       
-            }
+            /*  if (!user.IsPasswordReset)
+              {
+                   resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
+                   encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(resetToken));      
+              }*/
 
+            resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
+            encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(resetToken));
 
             return new UserLoginResponse
             {
