@@ -20,7 +20,6 @@ namespace attendance_tracking_backend.ClientHttp
         {
             var users = data;
 
-
             // Ensure roles exist
             if (!await _roleManager.RoleExistsAsync("Admin"))
                 await _roleManager.CreateAsync(new AppRole("Admin"));
@@ -28,7 +27,6 @@ namespace attendance_tracking_backend.ClientHttp
             if (!await _roleManager.RoleExistsAsync("User"))
                 await _roleManager.CreateAsync(new AppRole("User"));
                 
-
             if (users != null)
             {
                 foreach (var dto in users)
@@ -38,10 +36,8 @@ namespace attendance_tracking_backend.ClientHttp
 
                     var existingEmail = await _userManager.FindByEmailAsync(dto.Email!);
 
-                    if (existingUser != null) continue;
-
-                    if (existingEmail != null) continue;
-
+                    if (existingUser != null || existingEmail != null || dto.Status == "Retired") continue;  
+                    
                     var user = new AppUser
                     {
                         EmployeeName = dto.EmployeeName,
@@ -52,7 +48,7 @@ namespace attendance_tracking_backend.ClientHttp
                         IsPasswordReset = false
                     };
 
-                  var result =   await _userManager.CreateAsync(user, "password@123");
+                    var result =   await _userManager.CreateAsync(user, "password@123");
 
                     if(result.Succeeded)
                     { await _userManager.AddToRoleAsync(user, "User"); }
