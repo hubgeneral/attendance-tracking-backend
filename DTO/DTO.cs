@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
+
 namespace attendance_tracking_backend.DTO
 {
     //Employee Data
@@ -22,6 +23,7 @@ namespace attendance_tracking_backend.DTO
         public int Id { set; get; }
         public string? EmployeeName { set; get; }
         public string? Email { set; get; }
+
        [JsonConverter(typeof(NullableIntConverter))]
         public int? DaysRequested { set; get; }
         public DateTime? StartDate { set; get; }
@@ -73,8 +75,6 @@ namespace attendance_tracking_backend.DTO
         public string? Status { get; set; } 
 
     }
-
-
 
     //Dashboard DTOs
     public class DashboardRequests

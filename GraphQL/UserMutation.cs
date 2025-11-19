@@ -167,16 +167,7 @@ namespace attendance_tracking_backend.GraphQL
             };
         }
         //Creae User
-        public async Task<AppUser> CreateUser(
-            string employeeName,
-            string email,
-            string staffId,
-            string password,
-            string role,
-            string status,
-            [Service] DatabaseContext dbcontext,
-            [Service] UserManager<AppUser> userManager
-            )
+        public async Task<AppUser> CreateUser( string employeeName, string email,string staffId, string password, string role, string status, [Service] DatabaseContext dbcontext, [Service] UserManager<AppUser> userManager )
         {         
                 var user = new AppUser
                 {
@@ -193,17 +184,7 @@ namespace attendance_tracking_backend.GraphQL
         }
 
         // Update User       
-        public async  Task<AppUser?> UpdateUser(
-            int id,
-            string employeeName,
-            string email,
-            string staffId,
-            string password,
-            string role,
-            string status,
-            [Service] DatabaseContext dbcontext,
-            [Service] UserManager<AppUser> userManager
-            )
+        public async  Task<AppUser?> UpdateUser( int id,string employeeName, string email,string staffId, string password, string role, string status, [Service] DatabaseContext dbcontext, [Service] UserManager<AppUser> userManager )
         {        
             var user = await dbcontext.Users.FindAsync(id);
             
