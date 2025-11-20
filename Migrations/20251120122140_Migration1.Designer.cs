@@ -12,7 +12,7 @@ using attendance_tracking_backend.Data;
 namespace attendance_tracking_backend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251024192927_Migration1")]
+    [Migration("20251120122140_Migration1")]
     partial class Migration1
     {
         /// <inheritdoc />

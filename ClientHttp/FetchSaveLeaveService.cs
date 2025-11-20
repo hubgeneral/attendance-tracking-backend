@@ -40,8 +40,7 @@ namespace attendance_tracking_backend.ClientHttp
         public async Task StoreLeaveDataAsync(List<LeaveData> data)
         {
             if (data == null || data.Count == 0) return;
-
-            
+       
                 foreach (var dto in data)
                 {
                         // Check if email already exists to avoid duplicates
@@ -50,9 +49,15 @@ namespace attendance_tracking_backend.ClientHttp
 
                     if (existingLeave != null) continue;
 
-                    var appUserId = await dbcontext.AppUsers.Where(u => u.Email == dto.Email).Select(u => u.Id).FirstOrDefaultAsync();
+                   var appUserId = await dbcontext.AppUsers.Where(u => u.Email == dto.Email).Select(u => (int?)u.Id).FirstOrDefaultAsync();
 
-                    var leave = new Leave
+                    if (appUserId == null)
+                    {
+                        Console.WriteLine($"❌ No matching AppUser for email: {dto.Email}. Leave skipped.");
+                        continue;
+                    }
+
+                var leave = new Leave
                     {
                         Email = dto.Email,
                         EmployeeName = dto.EmployeeName,
@@ -60,8 +65,8 @@ namespace attendance_tracking_backend.ClientHttp
                         StartDate = DateTime.SpecifyKind((DateTime)dto.StartDate!.Value, DateTimeKind.Utc),
                         EndDate = DateTime.SpecifyKind((DateTime)dto.EndDate!.Value, DateTimeKind.Utc),
                         ApprovalStatus = dto.ApprovalStatus,
-                        AppUserId = appUserId
-                    };
+                        AppUserId = (int)appUserId
+                };
 
                         dbcontext.Leaves.Add(leave);
                     

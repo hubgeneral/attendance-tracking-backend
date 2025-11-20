@@ -14,15 +14,15 @@ namespace attendance_tracking_backend.Services
 
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
+
                 // Step 1: Fetch all EntryExitLogs for today with valid ExitTime
                 var groupedLogs = await dbcontext.EntryExitLogs.Where(e => e.CurrentDate == today && e.ExitTime != null)
                     .GroupBy(e => e.AttendanceId)
-                    .Select(g => new
-                    {
+                    .Select(g => new                         
+                    {                                                                                                
                         AttendanceId = g.Key,
-                        TotalExitTime = g.Sum(x => (x.ExitTime!.Value.Ticks - x.EntryTime!.Value.Ticks) / (decimal)TimeSpan.TicksPerSecond)
-                    })
-                    .ToListAsync();
+                        TotalExitTime = g.Sum(x => (x.ExitTime!.Value - x.EntryTime!.Value).TotalSeconds)   
+                    }).ToListAsync();
 
                 // Step 2: Update related Attendance.TotalHoursWorked
                 foreach (var logGroup in groupedLogs)
@@ -33,6 +33,7 @@ namespace attendance_tracking_backend.Services
                     {
                         // convert seconds → hours (2 decimal places)
                         attendance.TotalHoursWorked = Math.Round((decimal)logGroup.TotalExitTime /3600m, 2);
+                    
                     }
                 }
                 await dbcontext.SaveChangesAsync();
