@@ -43,15 +43,33 @@ namespace attendance_tracking_backend.GraphQL
                 };
 
             //Read key from config
-            var secret = config["Jwt:Key"];
-            if (string.IsNullOrEmpty(secret)) throw new InvalidOperationException("JWT key missing.");
+            var secret = config["TokenSettings:Key"];
+            if (string.IsNullOrEmpty(secret)) throw new InvalidOperationException("JWT key missing.");             //Console.WriteLine("Key bytes length: " + Convert.FromBase64String(secret).Length + " **********************************************************") ;
+
             //Create key and signing credentials
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+            //var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+            //var key = new SymmetricSecurityKey(Convert.FromBase64String(secret));
+            //var key = new SymmetricSecurityKey(Base64UrlEncoder.DecodeBytes(secret));
+            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            //  Create token
-            var accessToken = new JwtSecurityToken(issuer: config["Jwt:Issuer"], audience: config["Jwt:Audience"], claims: claims,   expires: DateTime.UtcNow.AddHours(1),signingCredentials: creds);
+            //Create token
+            
+            //var accessToken = new JwtSecurityToken(issuer: config["TokenSettings:Issuer"], audience: config["TokenSettings:Audience"], claims: claims, expires: DateTime.UtcNow.AddDays(7), signingCredentials: creds);
+            var accessToken = new SecurityTokenDescriptor
+            {
+                SigningCredentials = creds,
+                Subject = new ClaimsIdentity(claims),
+                Issuer = config["TokenSettings:Issuer"],
+                Audience = config["TokenSettings:Audience"],
+                Expires = DateTime.UtcNow.AddDays(7)
+            };
+            //var accessToken = new JwtSecurityToken(issuer: config["TokenSettings:Issuer"], audience: config["TokenSettings:Audience"], claims: claims, signingCredentials: creds);
+
             //return new JwtSecurityTokenHandler().WriteToken(token);
-            var accessTokenString = new JwtSecurityTokenHandler().WriteToken(accessToken);
+            var handler = new JwtSecurityTokenHandler();
+                
+                var token  = handler.CreateToken(accessToken);
+            var accessTokenString = handler.WriteToken(token);
 
             // --- Create Refresh Token ---
             var refreshToken = new RefreshToken
@@ -64,15 +82,8 @@ namespace attendance_tracking_backend.GraphQL
             dbcontext.RefreshTokens.Add(refreshToken);
             await dbcontext.SaveChangesAsync();
 
-
             var resetToken = "";
             var encodedToken = "";
-
-            /*  if (!user.IsPasswordReset)
-              {
-                   resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
-                   encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(resetToken));      
-              }*/
 
             resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
             encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(resetToken));
@@ -105,13 +116,17 @@ namespace attendance_tracking_backend.GraphQL
                   };
 
             //Read key from config
-            var secret = config["Jwt:Key"];
+            var secret = config["TokenSettings:Key"];
             if (string.IsNullOrEmpty(secret)) throw new InvalidOperationException("JWT key is not configured in appsettings.json or environment variables.");
             //Create key and signing credentials
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+            //var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+            var key = new SymmetricSecurityKey(Convert.FromBase64String(secret));
+
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             //Create token
-            var accessToken = new JwtSecurityToken(issuer: config["Jwt:Issuer"], audience: config["Jwt:Audience"], claims: claims, expires: DateTime.UtcNow.AddHours(1), signingCredentials: creds);
+            //var accessToken = new JwtSecurityToken(issuer: config["TokenSettings:Issuer"], audience: config["TokenSettings:Audience"], claims: claims, expires: DateTime.UtcNow.AddHours(3), signingCredentials: creds);
+            //var accessToken = new JwtSecurityToken(issuer: config["TokenSettings:Issuer"], audience: config["TokenSettings:Audience"], claims: claims, expires: DateTime.UtcNow.AddDays(7), signingCredentials: creds);
+            var accessToken = new JwtSecurityToken(issuer: config["TokenSettings:Issuer"], audience: config["TokenSettings:Audience"], claims: claims, signingCredentials: creds);
             //return new JwtSecurityTokenHandler().WriteToken(token);
             var accessTokenString = new JwtSecurityTokenHandler().WriteToken(accessToken);
 
@@ -167,16 +182,7 @@ namespace attendance_tracking_backend.GraphQL
             };
         }
         //Creae User
-        public async Task<AppUser> CreateUser(
-            string employeeName,
-            string email,
-            string staffId,
-            string password,
-            string role,
-            string status,
-            [Service] DatabaseContext dbcontext,
-            [Service] UserManager<AppUser> userManager
-            )
+        public async Task<AppUser> CreateUser( string employeeName, string email,string staffId, string password, string role, string status, [Service] DatabaseContext dbcontext, [Service] UserManager<AppUser> userManager )
         {         
                 var user = new AppUser
                 {
@@ -193,17 +199,7 @@ namespace attendance_tracking_backend.GraphQL
         }
 
         // Update User       
-        public async  Task<AppUser?> UpdateUser(
-            int id,
-            string employeeName,
-            string email,
-            string staffId,
-            string password,
-            string role,
-            string status,
-            [Service] DatabaseContext dbcontext,
-            [Service] UserManager<AppUser> userManager
-            )
+        public async  Task<AppUser?> UpdateUser( int id,string employeeName, string email,string staffId, string password, string role, string status, [Service] DatabaseContext dbcontext, [Service] UserManager<AppUser> userManager )
         {        
             var user = await dbcontext.Users.FindAsync(id);
             
@@ -231,7 +227,6 @@ namespace attendance_tracking_backend.GraphQL
         }
 
  
-       
     }
 }
 

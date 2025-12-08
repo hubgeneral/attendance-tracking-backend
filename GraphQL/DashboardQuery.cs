@@ -4,20 +4,17 @@ using HotChocolate.Data;
 using Microsoft.EntityFrameworkCore;
 using attendance_tracking_backend.DTO;
 using System;
+using HotChocolate.Authorization;
 
 namespace attendance_tracking_backend.GraphQL
 {
+    [Authorize]
     [ExtendObjectType(OperationTypeNames.Query)]
  
     public class DashboardQuery
     {
-        public DashboardTotalSummary GetDashboardTotalStats(
-            DateOnly? startDate,
-            DateOnly? endDate,
-            [Service] DatabaseContext dbcontext)
+        public DashboardTotalSummary GetDashboardTotalStats( DateOnly? startDate, DateOnly? endDate, [Service] DatabaseContext dbcontext)
         {
-
-
             var utcToday = DateOnly.FromDateTime(DateTime.UtcNow);
 
             var start = startDate ?? utcToday;
@@ -58,25 +55,9 @@ namespace attendance_tracking_backend.GraphQL
             };
         }
 
-        public class DashboardTotalSummary
-        {
-            public int TotalEmployees { get; set; }
-            public int EmployeesClockedIn { get; set; }
-            public int EmployeesClockedOut { get; set; }
-            public int TotalAbsent { get; set; }
-            public int TotalLeaves { get; set; }
+      
 
-        }
-        public class AverageClockTimeResult
-        {
-            public DateTime? AverageClockIn { get; set; }
-            public DateTime? AverageClockOut { get; set; }
-        }
-
-        public AverageClockTimeResult AverageClockTime(
-            DateOnly? startDate,
-            DateOnly? endDate,
-            [Service] DatabaseContext dbcontext)
+        public AverageClockTimeResult AverageClockTime(  DateOnly? startDate, DateOnly? endDate,[Service] DatabaseContext dbcontext)
         {
             var utcToday = DateOnly.FromDateTime(DateTime.UtcNow);
             var start = startDate ?? utcToday;
@@ -84,12 +65,12 @@ namespace attendance_tracking_backend.GraphQL
 
             var clockInTimes = dbcontext.Attendances
                 .Where(a => a.ClockIn != null && a.CurrentDate >= start && a.CurrentDate <= end)
-                .Select(a => a.ClockIn.Value.TimeOfDay.TotalMilliseconds)
+                .Select(a => a.ClockIn!.Value.TimeOfDay.TotalMilliseconds)
                 .ToList();
 
             var clockOutTimes = dbcontext.Attendances
                 .Where(a => a.ClockOut != null && a.CurrentDate >= start && a.CurrentDate <= end)
-                .Select(a => a.ClockOut.Value.TimeOfDay.TotalMilliseconds)
+                .Select(a => a.ClockOut!.Value.TimeOfDay.TotalMilliseconds)
                 .ToList();
 
             DateTime? averageClockIn = null;
@@ -108,18 +89,8 @@ namespace attendance_tracking_backend.GraphQL
             };
         }
 
-        public class GraphDataResults
-        {
-            public DayOfWeek Day { get; set; }
-            public int ClockedInCount { get; set; }
-            public int Absent { get; set; }
-            public int OnLeave { get; set; }
-        }
-
-        public IEnumerable<GraphDataResults> GraphData(
-    DateOnly? startDate,
-    DateOnly? endDate,
-    [Service] DatabaseContext dbcontext)
+     
+        public IEnumerable<GraphDataResults> GraphData( DateOnly? startDate, DateOnly? endDate,[Service] DatabaseContext dbcontext)
         {
             var utcToday = DateOnly.FromDateTime(DateTime.UtcNow);
 
@@ -307,8 +278,6 @@ namespace attendance_tracking_backend.GraphQL
 
             return punctualEmployees;
         }
-
-     
 
     }
 }
