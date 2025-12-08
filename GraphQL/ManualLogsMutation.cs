@@ -2,9 +2,12 @@
 using attendance_tracking_backend.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using HotChocolate.Authorization;
+
 
 namespace attendance_tracking_backend.GraphQL
 {
+    [Authorize]
     [ExtendObjectType(OperationTypeNames.Mutation)]
     public class ManualLogsMutation
     {

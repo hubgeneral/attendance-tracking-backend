@@ -1,6 +1,7 @@
 ﻿using attendance_tracking_backend.Data;
 using attendance_tracking_backend.DTO;
 using attendance_tracking_backend.Helpers;
+using HotChocolate.Authorization;
 using HotChocolate.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,6 +12,7 @@ namespace attendance_tracking_backend.GraphQL
     [ExtendObjectType(OperationTypeNames.Query)]
     public class AttendanceQuery
     {
+        [Authorize]
         [UseProjection, UseFiltering,UseSorting]
         public IQueryable<Attendance> GetAttendances([Service] DatabaseContext dbcontext)  //get all attendances
         {
