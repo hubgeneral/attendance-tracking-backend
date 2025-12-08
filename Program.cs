@@ -9,7 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
- 
+
+
 namespace attendance_tracking_backend
 {
     public class Program
@@ -19,7 +20,6 @@ namespace attendance_tracking_backend
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
             // Database
             builder.Services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("PgsqlConnection")));
             // Identity
@@ -27,35 +27,58 @@ namespace attendance_tracking_backend
             {
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
-                options.Password.RequiredUniqueChars = 0;
-              
+                options.Password.RequiredUniqueChars = 0;            
             })
             .AddEntityFrameworkStores<DatabaseContext>()
             .AddDefaultTokenProviders();
 
-            //JWT Authentication
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            //JWT Authentication *****************************************************************
+            var secretKeyString = builder.Configuration["TokenSettings:Key"]!;
+            if (string.IsNullOrEmpty(secretKeyString))
+            {
+                throw new InvalidOperationException("JWT key (TokenSettings:Key) is missing or empty.");
+            }
+            var secretKeyBytes = Encoding.ASCII.GetBytes(secretKeyString);
+            var signingKey = new SymmetricSecurityKey(secretKeyBytes);
+
+           // builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            builder.Services.AddAuthentication(x => {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; 
+            })
+               .AddJwtBearer(options =>
                 {
-                    options.RequireHttpsMetadata = false; //for localhost
                     options.SaveToken = true;
+                    //options.RequireHttpsMetadata = false; //for localhost
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ValidateLifetime = true,
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+                        ValidIssuer =  builder.Configuration["TokenSettings:Issuer"],
+                        ValidAudience = builder.Configuration["TokenSettings:Audience"],
+                        IssuerSigningKey = signingKey,
+                        //IssuerSigningKey = new SymmetricSecurityKey(Base64UrlEncoder.DecodeBytes(builder.Configuration["TokenSettings:Key"]!)),
+                        //IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(builder.Configuration["TokenSettings:Key"]!)),
+                        ValidateLifetime = true,
+                        //ClockSkew = TimeSpan.Zero,
                     };
+
                 });
 
-            builder.Services.AddAuthorization();
+           // builder.Services.Configure<Jwt>(builder.Configuration.GetSection("Jwt")); ***********************************************************
+            //End of JWT Authentication ***************************************************************
+
+
             //Http Clients and Services
             builder.Services.AddHttpClient<UserApiService>();
             builder.Services.AddHttpClient<FetchSaveLeaveService>();
             builder.Services.AddScoped<UserApiService>();
             builder.Services.AddScoped<UserDataService>();
-         
+
+            builder.Services.AddAuthorization();
+
             // GraphQL
             builder.Services.AddGraphQLServer()
                 .AddQueryType<Query>() //root querytype
@@ -73,8 +96,9 @@ namespace attendance_tracking_backend
                     .AddTypeExtension<RequestLogsMutation>()
                 .AddProjections()
                 .AddFiltering()
-                .AddSorting();
-            //.AddType<UserType>() // optional
+                .AddSorting()
+                .AddAuthorization();  //graphql server authorization;
+
 
             // CORS : old way of implementing cors
             /*  builder.Services.AddCors(options =>
@@ -122,7 +146,7 @@ namespace attendance_tracking_backend
             }
             app.UseRouting();
             app.UseAuthentication();
-            app.UseAuthorization();
+            app.UseAuthorization();  
             app.MapGraphQL();
             app.Run();
         }

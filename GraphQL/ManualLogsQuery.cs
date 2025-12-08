@@ -2,10 +2,12 @@
 using HotChocolate.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
+using HotChocolate.Authorization;
+
 
 namespace attendance_tracking_backend.GraphQL
 {
-
+    [Authorize]
     [ExtendObjectType(OperationTypeNames.Query)]
     public class ManualLogsQuery
     {

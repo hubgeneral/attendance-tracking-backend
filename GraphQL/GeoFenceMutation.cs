@@ -8,6 +8,7 @@ using attendance_tracking_backend.Helpers;
 
 namespace attendance_tracking_backend.GraphQL
 {
+
     [ExtendObjectType(OperationTypeNames.Mutation)]
     public class GeoFenceMutation
     {

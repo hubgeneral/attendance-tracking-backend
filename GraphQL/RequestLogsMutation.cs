@@ -1,9 +1,11 @@
 ﻿using HotChocolate.Data;
 using attendance_tracking_backend.Data;
 using Microsoft.AspNetCore.Identity;
+using HotChocolate.Authorization;
 
 namespace attendance_tracking_backend.GraphQL
 {
+    [Authorize]
     [ExtendObjectType(OperationTypeNames.Mutation)]
     public class RequestLogsMutation
     {
