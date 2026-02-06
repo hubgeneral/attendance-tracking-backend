@@ -23,11 +23,11 @@ namespace attendance_tracking_backend
             // Database
             builder.Services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("PgsqlConnection")));
             // Identity
-            builder.Services.AddIdentity<AppUser,AppRole>(options =>
+            builder.Services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
-                options.Password.RequiredUniqueChars = 0;            
+                options.Password.RequiredUniqueChars = 0;
             })
             .AddEntityFrameworkStores<DatabaseContext>()
             .AddDefaultTokenProviders();
@@ -41,11 +41,12 @@ namespace attendance_tracking_backend
             var secretKeyBytes = Encoding.ASCII.GetBytes(secretKeyString);
             var signingKey = new SymmetricSecurityKey(secretKeyBytes);
 
-           // builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            builder.Services.AddAuthentication(x => {
+            // builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            builder.Services.AddAuthentication(x =>
+            {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; 
+                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
                .AddJwtBearer(options =>
                 {
@@ -56,7 +57,7 @@ namespace attendance_tracking_backend
                         ValidateIssuer = true,
                         ValidateAudience = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer =  builder.Configuration["TokenSettings:Issuer"],
+                        ValidIssuer = builder.Configuration["TokenSettings:Issuer"],
                         ValidAudience = builder.Configuration["TokenSettings:Audience"],
                         IssuerSigningKey = signingKey,
                         //IssuerSigningKey = new SymmetricSecurityKey(Base64UrlEncoder.DecodeBytes(builder.Configuration["TokenSettings:Key"]!)),
@@ -64,10 +65,19 @@ namespace attendance_tracking_backend
                         ValidateLifetime = true,
                         //ClockSkew = TimeSpan.Zero,
                     };
-
+                    // Allow requests to proceed when auth fails - [AllowAnonymous] will permit access
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            // Don't reject the request - just mark as unauthenticated
+                            context.NoResult();
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
-           // builder.Services.Configure<Jwt>(builder.Configuration.GetSection("Jwt")); ***********************************************************
+            // builder.Services.Configure<Jwt>(builder.Configuration.GetSection("Jwt")); ***********************************************************
             //End of JWT Authentication ***************************************************************
 
 
@@ -82,16 +92,19 @@ namespace attendance_tracking_backend
             // GraphQL
             builder.Services.AddGraphQLServer()
                 .AddQueryType<Query>() //root querytype
+                    .AddTypeExtension<FingerprintUserQuery>()
                     .AddTypeExtension<UserQuery>()
                     .AddTypeExtension<AttendanceQuery>()
                     .AddTypeExtension<DashboardQuery>()
                     .AddTypeExtension<ManualLogsQuery>()
                     .AddTypeExtension<RequestLogsQuery>()
                     .AddTypeExtension<LeaveQuery>()
+
                 .AddMutationType<Mutation>()   //root mutationtype
                     .AddTypeExtension<UserMutation>()
                     .AddTypeExtension<AttendanceMutation>()
                     .AddTypeExtension<GeoFenceMutation>()
+                    .AddTypeExtension<FingerprintMutation>()
                     .AddTypeExtension<ManualLogsMutation>()
                     .AddTypeExtension<RequestLogsMutation>()
                 .AddProjections()
@@ -101,12 +114,15 @@ namespace attendance_tracking_backend
 
 
             // CORS : old way of implementing cors
-            /*  builder.Services.AddCors(options =>
-              {
-                 options.AddPolicy("AllowAll",p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
-              });*/
+            builder.Services.AddCors(options =>
+                 {
+                     options.AddPolicy("AllowAll", p => p
+                         .AllowAnyOrigin()
+                         .AllowAnyMethod()
+                         .AllowAnyHeader());
+                 });
 
-            builder.Services.AddCors();
+            builder.Services.AddControllers();
             var app = builder.Build();
             app.UseCors("AllowAll"); //Use Cors
             // After var app = builder.Build();
@@ -133,11 +149,11 @@ namespace attendance_tracking_backend
             JobManager.Initialize(new TotalDailyHoursWorkedRegistry());
             JobManager.JobException += info =>
             {
-               Console.WriteLine($"[Scheduler Error] {info.Exception.Message}");
+                Console.WriteLine($"[Scheduler Error] {info.Exception.Message}");
             };
 
             // Middlewares
-            if(app.Environment.IsDevelopment())
+            if (app.Environment.IsDevelopment())
             {
                 app.UseCors(policy => policy
                     .AllowAnyOrigin()
@@ -146,8 +162,9 @@ namespace attendance_tracking_backend
             }
             app.UseRouting();
             app.UseAuthentication();
-            app.UseAuthorization();  
+            app.UseAuthorization();
             app.MapGraphQL();
+            app.MapControllers();
             app.Run();
         }
     }

@@ -24,7 +24,7 @@ namespace attendance_tracking_backend.DTO
         public string? EmployeeName { set; get; }
         public string? Email { set; get; }
 
-       [JsonConverter(typeof(NullableIntConverter))]
+        [JsonConverter(typeof(NullableIntConverter))]
         public int? DaysRequested { set; get; }
         public DateTime? StartDate { set; get; }
         public DateTime? EndDate { set; get; }
@@ -32,10 +32,10 @@ namespace attendance_tracking_backend.DTO
     }
 
     public class UserLoginResponse
-    {     
+    {
         public string? Id { get; set; }
         public string? UserName { get; set; }
-        public string? Role {  get; set; }
+        public string? Role { get; set; }
         public string? AccessToken { get; set; }   // add token here
         public string? RefreshToken { get; set; }   // add token here
         public bool IsPasswordReset { get; set; }
@@ -65,14 +65,14 @@ namespace attendance_tracking_backend.DTO
     public class UserWithRoleResponse
     {
         public int UserId { get; set; }
-        public string? StaffId { get; set; } 
-        public string? UserName { get; set; } 
-        public string? EmployeeName { get; set; } 
-        public string? EmployeeType { get; set; } 
-        public string? Email { get; set; } 
-        public int RoleId { get; set; } 
-        public string? RoleName { get; set; } 
-        public string? Status { get; set; } 
+        public string? StaffId { get; set; }
+        public string? UserName { get; set; }
+        public string? EmployeeName { get; set; }
+        public string? EmployeeType { get; set; }
+        public string? Email { get; set; }
+        public int RoleId { get; set; }
+        public string? RoleName { get; set; }
+        public string? Status { get; set; }
 
     }
 
@@ -88,7 +88,7 @@ namespace attendance_tracking_backend.DTO
     public class LateEmployees
     {
         public string? EmployeeName { set; get; }
-        public DateTime?  TimeOfDay { set; get; }       
+        public DateTime? TimeOfDay { set; get; }
     }
 
     public class PunctualEmployees
@@ -99,8 +99,8 @@ namespace attendance_tracking_backend.DTO
 
     public class WorkingHours
     {
-        public decimal TotalWorkingHours {  get; set; }
-        public decimal TotalOffHours {  get; set; } 
+        public decimal TotalWorkingHours { get; set; }
+        public decimal TotalOffHours { get; set; }
 
     }
 
@@ -153,7 +153,8 @@ namespace attendance_tracking_backend.DTO
 
     }
 
-    public class AverageAttendanceResult {
+    public class AverageAttendanceResult
+    {
         public int UserId { get; set; }
         public string? EmployeeeName { get; set; }
         public DateOnly startDate { get; set; }
@@ -161,7 +162,13 @@ namespace attendance_tracking_backend.DTO
         public DateTime? AverageClockIn { get; set; }
         public DateTime? AverageClockOut { get; set; }
         public Decimal? AverageTotalHoursWorked { get; set; }
-         
+
+    }
+
+    public class FingerprintUser
+    {
+        public int UserId { get; set; }
+        public string? EmployeeName { get; set; }
     }
 
 

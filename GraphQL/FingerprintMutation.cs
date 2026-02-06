@@ -1,4 +1,4 @@
-﻿using attendance_tracking_backend.Data;
+using attendance_tracking_backend.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using HotChocolate;
@@ -10,11 +10,11 @@ using HotChocolate.Authorization;
 namespace attendance_tracking_backend.GraphQL
 {
     [ExtendObjectType(OperationTypeNames.Mutation)]
-    public class GeoFenceMutation
+    public class FingerprintMutation
     {
         // Clock In
-
-        public async Task<string> GeofenceClockIn(int id, DateTime clockinUtc, [Service] DatabaseContext dbcontext)
+        [AllowAnonymous]
+        public async Task<string> FingerprintClockIn(int id, DateTime clockinUtc, [Service] DatabaseContext dbcontext)
         {
             var clockInTime = clockinUtc.ToUniversalTime();
 
@@ -101,7 +101,8 @@ namespace attendance_tracking_backend.GraphQL
         }
 
         // Clock Out
-        public async Task<string> GeofenceClockOut(int id, DateTime clockoutUtc, [Service] DatabaseContext dbcontext)
+        [AllowAnonymous]
+        public async Task<string> FingerprintClockOut(int id, DateTime clockoutUtc, [Service] DatabaseContext dbcontext)
         {
             var clockOutTime = clockoutUtc.ToUniversalTime();
 

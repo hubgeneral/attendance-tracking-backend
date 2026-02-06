@@ -25,7 +25,7 @@ namespace attendance_tracking_backend.GraphQL
         }
 
         [UseProjection, UseFiltering, UseSorting]
-        public  IEnumerable<UserWithRoleResponse> GetUsersWithRoles([Service] DatabaseContext context)
+        public IEnumerable<UserWithRoleResponse> GetUsersWithRoles([Service] DatabaseContext context)
         {
             var query = from user in context.Users
                         join userRole in context.UserRoles on user.Id equals userRole.UserId

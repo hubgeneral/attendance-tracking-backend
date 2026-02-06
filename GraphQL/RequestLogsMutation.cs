@@ -5,7 +5,7 @@ using HotChocolate.Authorization;
 
 namespace attendance_tracking_backend.GraphQL
 {
-    [Authorize]
+   [Authorize]
     [ExtendObjectType(OperationTypeNames.Mutation)]
     public class RequestLogsMutation
     {

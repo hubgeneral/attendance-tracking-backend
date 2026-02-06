@@ -12,7 +12,7 @@ namespace attendance_tracking_backend.Data
         {
             var optionsBuilder = new DbContextOptionsBuilder<DatabaseContext>();
             //match the same provider + connection string you use in Program.cs
-            optionsBuilder.UseNpgsql("Host=localhost;Database=attendance_tracking_db;Username=postgres;Password=lakers");
+            optionsBuilder.UseNpgsql("Host=localhost;Database=hmClock;Username=postgres;Password=root");
 
             return new DatabaseContext(optionsBuilder.Options);
         }

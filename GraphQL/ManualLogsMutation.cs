@@ -11,7 +11,7 @@ namespace attendance_tracking_backend.GraphQL
     [ExtendObjectType(OperationTypeNames.Mutation)]
     public class ManualLogsMutation
     {
-        public  async Task<RequestLog> CreateManualLog(int userid, string employeeName, string reason,DateTime clockIn,DateTime clockOut,string approvalStatus,int adminId, string adminName, [Service] DatabaseContext dbcontext)
+        public async Task<RequestLog> CreateManualLog(int userid, string employeeName, string reason, DateTime clockIn, DateTime clockOut, string approvalStatus, int adminId, string adminName, [Service] DatabaseContext dbcontext)
         {
             DateTime timeOfDay = DateTime.UtcNow;
             DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -24,14 +24,14 @@ namespace attendance_tracking_backend.GraphQL
 
             var newRequestLog = new RequestLog
             {
-               EmployeeName = employeeName, 
-               Reason = reason,
-               ClockIn = clockIn,
-               ClockOut = clockOut,
-               ActionBy = adminUser.EmployeeName,
-               TimeOfDay = timeOfDay,
-               ApprovalStatus= approvalStatus,
-               AppUserId = employee.Id         
+                EmployeeName = employeeName,
+                Reason = reason,
+                ClockIn = clockIn,
+                ClockOut = clockOut,
+                ActionBy = adminUser.EmployeeName,
+                TimeOfDay = timeOfDay,
+                ApprovalStatus = approvalStatus,
+                AppUserId = employee.Id
             };
 
             dbcontext.RequestLogs.Add(newRequestLog);
@@ -39,7 +39,7 @@ namespace attendance_tracking_backend.GraphQL
 
             var attendance = await dbcontext.Attendances.FirstOrDefaultAsync(a => a.CurrentDate == today && a.AppUserId == employee.Id);
 
-            if(attendance == null)
+            if (attendance == null)
             {
                 var newAttendance = new Attendance
                 {
@@ -61,7 +61,7 @@ namespace attendance_tracking_backend.GraphQL
                 attendance.ClockOut = clockOut;
                 await dbcontext.SaveChangesAsync();
             }
-                return newRequestLog;
+            return newRequestLog;
         }
     }
 }
